@@ -1,0 +1,35 @@
+@model IEnumerable<tickets.Models.Screening>
+
+@{
+    ViewData["Title"] = "Screenings";
+}
+
+<h2>Screenings</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create screening</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Film title</th>
+            <th>Date and time</th>
+            <th>Cinema</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var screening in Model)
+    {
+        <tr>
+            <td>@screening.FilmTitle</td>
+            <td>@screening.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>@screening.Cinema?.Name</td>
+            <td>
+                <a asp-action="Delete" asp-route-id="@screening.Id" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

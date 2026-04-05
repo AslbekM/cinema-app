@@ -1,0 +1,30 @@
+@model tickets.Models.Screening
+
+@{
+    ViewData["Title"] = "Create screening";
+}
+
+<h2>Create screening</h2>
+
+<form asp-action="Create" method="post">
+    <div class="mb-3">
+        <label asp-for="FilmTitle" class="form-label"></label>
+        <input asp-for="FilmTitle" class="form-control" />
+        <span asp-validation-for="FilmTitle" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartTime" class="form-label"></label>
+        <input asp-for="StartTime" type="datetime-local" class="form-control" />
+        <span asp-validation-for="StartTime" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CinemaId" class="form-label">Cinema</label>
+        <select asp-for="CinemaId" asp-items="ViewBag.Cinemas" class="form-select"></select>
+        <span asp-validation-for="CinemaId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>
