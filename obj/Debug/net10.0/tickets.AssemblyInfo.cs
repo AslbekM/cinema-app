@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("tickets")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6b8932a7b048aa584fd305ef85f98124d60822f4")]
 [assembly: System.Reflection.AssemblyProductAttribute("tickets")]
 [assembly: System.Reflection.AssemblyTitleAttribute("tickets")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
