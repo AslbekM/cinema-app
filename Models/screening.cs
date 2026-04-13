@@ -19,5 +19,7 @@ namespace tickets.Models
 
         [ForeignKey("CinemaId")]
         public Cinema? Cinema { get; set; }
+
+        public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
 }

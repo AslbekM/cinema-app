@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using tickets.Data;
 using tickets.Models;
+using tickets.ViewModels;
 
 namespace tickets.Controllers
 {
@@ -25,6 +27,45 @@ namespace tickets.Controllers
             return View(screenings);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var screening = await _db.Screenings
+                .Include(s => s.Cinema)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (screening == null)
+                return NotFound();
+
+            var reservations = await _db.Reservations
+                .Where(r => r.ScreeningId == id)
+                .ToListAsync();
+
+            var userId = User.Identity?.IsAuthenticated == true
+                ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                : null;
+
+            var model = new ScreeningSeatsVm
+            {
+                ScreeningId = screening.Id,
+                FilmTitle = screening.FilmTitle,
+                StartTime = screening.StartTime,
+                CinemaName = screening.Cinema?.Name ?? "",
+                Rows = screening.Cinema?.Rows ?? 0,
+                SeatsPerRow = screening.Cinema?.SeatsPerRow ?? 0,
+                ReservedSeats = reservations
+                    .Select(r => $"{r.RowNumber}-{r.SeatNumber}")
+                    .ToHashSet(),
+                MySeats = reservations
+                    .Where(r => r.AppUserId == userId)
+                    .Select(r => $"{r.RowNumber}-{r.SeatNumber}")
+                    .ToHashSet(),
+                IsLoggedIn = User.Identity?.IsAuthenticated ?? false
+            };
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Create()
         {
@@ -32,6 +73,7 @@ namespace tickets.Controllers
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Screening screening)
@@ -44,9 +86,11 @@ namespace tickets.Controllers
 
             _db.Screenings.Add(screening);
             await _db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
@@ -60,6 +104,7 @@ namespace tickets.Controllers
             return View(screening);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -71,6 +116,7 @@ namespace tickets.Controllers
 
             _db.Screenings.Remove(screening);
             await _db.SaveChangesAsync();
+
             return RedirectToAction(nameof(Index));
         }
     }

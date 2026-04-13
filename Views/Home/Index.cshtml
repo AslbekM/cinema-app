@@ -1,12 +1,41 @@
-﻿@{
+﻿@model IEnumerable<tickets.Models.Screening>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="hero-main">
-    <div class="hero-overlay">
-        <div class="hero-content text-center">
-            <h1 class="main-title">Cinema Ticket System</h1>
-            <p class="main-subtitle">Book your perfect movie night</p>
-        </div>
-    </div>
+<div class="text-center">
+    <h1 style="
+        margin-top: 2cm;
+        margin-bottom: 1cm;
+        font-weight: bold;
+        font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, serif;
+        font-size: 48px;">
+        Cinema Ticket System
+    </h1>
 </div>
+
+<h2 class="mt-4 mb-3">Available Screenings</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Film title</th>
+            <th>Date and time</th>
+            <th>Cinema</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var screening in Model)
+    {
+        <tr>
+            <td>@screening.FilmTitle</td>
+            <td>@screening.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
+            <td>@screening.Cinema?.Name</td>
+            <td>
+                <a asp-controller="Screenings" asp-action="Details" asp-route-id="@screening.Id" class="btn btn-primary btn-sm">Seats</a>            </td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -6,9 +6,12 @@
 
 <h2>Screenings</h2>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create screening</a>
-</p>
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create screening</a>
+    </p>
+}
 
 <table class="table table-bordered table-striped">
     <thead>
@@ -27,7 +30,12 @@
             <td>@screening.StartTime.ToString("yyyy-MM-dd HH:mm")</td>
             <td>@screening.Cinema?.Name</td>
             <td>
-                <a asp-action="Delete" asp-route-id="@screening.Id" class="btn btn-danger btn-sm">Delete</a>
+                <a asp-action="Details" asp-route-id="@screening.Id" class="btn btn-primary btn-sm me-1">Seats</a>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-action="Delete" asp-route-id="@screening.Id" class="btn btn-danger btn-sm">Delete</a>
+                }
             </td>
         </tr>
     }

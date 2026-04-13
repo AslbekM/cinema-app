@@ -1,13 +1,13 @@
-@model tickets.ViewModels.UserEditVm
+@model tickets.ViewModels.RegisterVm
 
 @{
-    ViewData["Title"] = "Edit user";
+    ViewData["Title"] = "Register";
 }
 
-<h2>Edit user</h2>
+<h2>Register</h2>
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+<form asp-action="Register" method="post">
+    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
     <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="mb-3">
@@ -34,6 +34,22 @@
         <span asp-validation-for="Nickname" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back</a>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Register</button>
 </form>
+
+<p class="mt-3">
+    Already have an account?
+    <a asp-action="Login" asp-route-returnUrl="@ViewBag.ReturnUrl">Login here</a>
+</p>
