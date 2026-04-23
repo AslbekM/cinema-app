@@ -31,6 +31,7 @@ namespace tickets.Controllers
         {
             var screening = await _db.Screenings
                 .Include(s => s.Cinema)
+                .ThenInclude(c => c!.Seats)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (screening == null)
@@ -50,15 +51,9 @@ namespace tickets.Controllers
                 FilmTitle = screening.FilmTitle,
                 StartTime = screening.StartTime,
                 CinemaName = screening.Cinema?.Name ?? "",
-                Rows = screening.Cinema?.Rows ?? 0,
-                SeatsPerRow = screening.Cinema?.SeatsPerRow ?? 0,
-                ReservedSeats = reservations
-                    .Select(r => $"{r.RowNumber}-{r.SeatNumber}")
-                    .ToHashSet(),
-                MySeats = reservations
-                    .Where(r => r.AppUserId == userId)
-                    .Select(r => $"{r.RowNumber}-{r.SeatNumber}")
-                    .ToHashSet(),
+                Seats = screening.Cinema?.Seats.OrderBy(s => s.RowNumber).ThenBy(s => s.SeatNumber).ToList() ?? new(),
+                ReservedSeatIds = reservations.Select(r => r.SeatId).ToHashSet(),
+                MySeatIds = reservations.Where(r => r.AppUserId == userId).Select(r => r.SeatId).ToHashSet(),
                 IsLoggedIn = User.Identity?.IsAuthenticated ?? false
             };
 

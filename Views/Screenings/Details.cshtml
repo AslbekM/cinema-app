@@ -34,33 +34,31 @@
     <div style="height: 10px; background-color: #ccc; border-radius: 10px; margin-top: 8px;"></div>
 </div>
 
-@for (int row = 1; row <= Model.Rows; row++)
+@foreach (var rowGroup in Model.Seats.GroupBy(s => s.RowNumber).OrderBy(g => g.Key))
 {
     <div class="mb-2">
-        <strong>Row @row</strong>
+        <strong>Row @rowGroup.Key</strong>
         <div class="d-flex flex-wrap gap-2 mt-2">
-            @for (int seat = 1; seat <= Model.SeatsPerRow; seat++)
+            @foreach (var seat in rowGroup.OrderBy(s => s.SeatNumber))
             {
-                var key = $"{row}-{seat}";
-                var taken = Model.ReservedSeats.Contains(key);
-                var mine = Model.MySeats.Contains(key);
+                var taken = Model.ReservedSeatIds.Contains(seat.Id);
+                var mine = Model.MySeatIds.Contains(seat.Id);
 
                 if (mine)
                 {
                     <form asp-controller="Reservations" asp-action="Cancel" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="screeningId" value="@Model.ScreeningId" />
-                        <input type="hidden" name="rowNumber" value="@row" />
-                        <input type="hidden" name="seatNumber" value="@seat" />
+                        <input type="hidden" name="seatId" value="@seat.Id" />
                         <button type="submit" class="btn btn-warning btn-sm">
-                            @seat
+                            @seat.SeatNumber
                         </button>
                     </form>
                 }
                 else if (taken)
                 {
                     <button class="btn btn-danger btn-sm" disabled>
-                        @seat
+                        @seat.SeatNumber
                     </button>
                 }
                 else if (Model.IsLoggedIn)
@@ -68,10 +66,9 @@
                     <form asp-controller="Reservations" asp-action="Reserve" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="screeningId" value="@Model.ScreeningId" />
-                        <input type="hidden" name="rowNumber" value="@row" />
-                        <input type="hidden" name="seatNumber" value="@seat" />
+                        <input type="hidden" name="seatId" value="@seat.Id" />
                         <button type="submit" class="btn btn-success btn-sm">
-                            @seat
+                            @seat.SeatNumber
                         </button>
                     </form>
                 }
@@ -81,7 +78,7 @@
                        asp-action="Login"
                        asp-route-returnUrl="@returnUrl"
                        class="btn btn-outline-primary btn-sm">
-                        @seat
+                        @seat.SeatNumber
                     </a>
                 }
             }

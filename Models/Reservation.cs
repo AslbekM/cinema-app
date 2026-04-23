@@ -19,10 +19,10 @@ namespace tickets.Models
         [ForeignKey(nameof(AppUserId))]
         public AppUser? AppUser { get; set; }
 
-        [Range(1, 100)]
-        public int RowNumber { get; set; }
+        [Required]
+        public int SeatId { get; set; }
 
-        [Range(1, 100)]
-        public int SeatNumber { get; set; }
+        [ForeignKey(nameof(SeatId))]
+        public Seat? Seat { get; set; }
     }
-}   
+}

@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace tickets.ViewModels
 {
-    public class UserEditVm
+    public class ProfileVm
     {
         public string Id { get; set; } = string.Empty;
 
@@ -23,5 +23,15 @@ namespace tickets.ViewModels
         public string Nickname { get; set; } = string.Empty;
 
         public byte[]? RowVersion { get; set; }
+
+        [DataType(DataType.Password)]
+        public string? CurrentPassword { get; set; }
+
+        [DataType(DataType.Password)]
+        public string? NewPassword { get; set; }
+
+        [DataType(DataType.Password)]
+        [Compare("NewPassword")]
+        public string? ConfirmNewPassword { get; set; }
     }
 }

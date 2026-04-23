@@ -12,5 +12,8 @@ namespace tickets.Models
         [Required]
         [StringLength(50)]
         public string LastName { get; set; } = string.Empty;
+
+        [Timestamp]
+        public byte[]? RowVersion { get; set; }
     }
-}
+}   

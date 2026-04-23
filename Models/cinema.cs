@@ -17,5 +17,6 @@ namespace tickets.Models
         public int SeatsPerRow { get; set; }
 
         public ICollection<Screening> Screenings { get; set; } = new List<Screening>();
+        public ICollection<Seat> Seats { get; set; } = new List<Seat>();
     }
 }

@@ -1,0 +1,32 @@
+@model tickets.ViewModels.UserDeleteVm
+
+@{
+    ViewData["Title"] = "Delete user";
+}
+
+<h2>Delete user</h2>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this user?
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">First name</dt>
+    <dd class="col-sm-9">@Model.FirstName</dd>
+
+    <dt class="col-sm-3">Last name</dt>
+    <dd class="col-sm-9">@Model.LastName</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Nickname</dt>
+    <dd class="col-sm-9">@Model.Nickname</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="RowVersion" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form>

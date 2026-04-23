@@ -21,33 +21,19 @@ namespace tickets.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Reserve(int screeningId, int rowNumber, int seatNumber)
+        public async Task<IActionResult> Reserve(int screeningId, int seatId)
         {
             var userId = _userManager.GetUserId(User);
 
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Account");
 
-            var alreadyTaken = await _db.Reservations.AnyAsync(r =>
-                r.ScreeningId == screeningId &&
-                r.RowNumber == rowNumber &&
-                r.SeatNumber == seatNumber);
-
-            if (alreadyTaken)
-            {
-                TempData["SeatError"] = "This seat is already taken.";
-                return RedirectToAction("Details", "Screenings", new { id = screeningId });
-            }
-
-            var reservation = new Reservation
+            _db.Reservations.Add(new Reservation
             {
                 ScreeningId = screeningId,
                 AppUserId = userId,
-                RowNumber = rowNumber,
-                SeatNumber = seatNumber
-            };
-
-            _db.Reservations.Add(reservation);
+                SeatId = seatId
+            });
 
             try
             {
@@ -64,7 +50,7 @@ namespace tickets.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Cancel(int screeningId, int rowNumber, int seatNumber)
+        public async Task<IActionResult> Cancel(int screeningId, int seatId)
         {
             var userId = _userManager.GetUserId(User);
 
@@ -73,8 +59,7 @@ namespace tickets.Controllers
 
             var reservation = await _db.Reservations.FirstOrDefaultAsync(r =>
                 r.ScreeningId == screeningId &&
-                r.RowNumber == rowNumber &&
-                r.SeatNumber == seatNumber &&
+                r.SeatId == seatId &&
                 r.AppUserId == userId);
 
             if (reservation == null)
