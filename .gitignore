@@ -1,3 +1,5 @@
 bin/
 obj/
 .claude/
+ClientApp/node_modules/
+wwwroot/app/

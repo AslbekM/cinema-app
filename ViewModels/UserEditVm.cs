@@ -22,6 +22,9 @@ namespace tickets.ViewModels
         [StringLength(30)]
         public string Nickname { get; set; } = string.Empty;
 
+        [Phone]
+        public string? PhoneNumber { get; set; }
+
         public byte[]? RowVersion { get; set; }
     }
 }

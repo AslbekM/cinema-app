@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using tickets.Data;
 using tickets.Models;
 using tickets.ViewModels;
 
@@ -10,10 +12,12 @@ namespace tickets.Controllers
     public class UsersController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly AppDb _db;
 
-        public UsersController(UserManager<AppUser> userManager)
+        public UsersController(UserManager<AppUser> userManager, AppDb db)
         {
             _userManager = userManager;
+            _db = db;
         }
 
         public IActionResult Index()
@@ -25,8 +29,10 @@ namespace tickets.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return NotFound();
 
             return View(new UserEditVm
             {
@@ -35,6 +41,7 @@ namespace tickets.Controllers
                 LastName = user.LastName,
                 Email = user.Email ?? "",
                 Nickname = user.UserName ?? "",
+                PhoneNumber = user.PhoneNumber,
                 RowVersion = user.RowVersion
             });
         }
@@ -46,45 +53,55 @@ namespace tickets.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == model.Id);
+
             if (user == null)
             {
                 ModelState.AddModelError("", "This user was already deleted by another admin.");
                 return View(model);
             }
 
-            if (!RowVersionsMatch(user.RowVersion, model.RowVersion))
-            {
-                ModelState.AddModelError("", "This user was changed by another admin. Reload the page and try again.");
-                model.FirstName = user.FirstName;
-                model.LastName = user.LastName;
-                model.Email = user.Email ?? "";
-                model.Nickname = user.UserName ?? "";
-                model.RowVersion = user.RowVersion;
-                return View(model);
-            }
+            _db.Entry(user).Property(nameof(AppUser.RowVersion)).OriginalValue = model.RowVersion;
 
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.Email = model.Email;
             user.UserName = model.Nickname;
+            user.PhoneNumber = model.PhoneNumber;
 
-            var result = await _userManager.UpdateAsync(user);
-
-            if (result.Succeeded)
+            try
+            {
+                await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                ModelState.AddModelError("", "This user was changed by another admin. Reload the page and try again.");
 
-            foreach (var error in result.Errors)
-                ModelState.AddModelError("", error.Description);
+                var current = await _db.Users
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(u => u.Id == model.Id);
 
-            return View(model);
+                if (current != null)
+                {
+                    model.FirstName = current.FirstName;
+                    model.LastName = current.LastName;
+                    model.Email = current.Email ?? "";
+                    model.Nickname = current.UserName ?? "";
+                    model.RowVersion = current.RowVersion;
+                }
+
+                return View(model);
+            }
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
-            if (user == null) return NotFound();
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null)
+                return NotFound();
 
             return View(new UserDeleteVm
             {
@@ -101,7 +118,8 @@ namespace tickets.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(UserDeleteVm model)
         {
-            var user = await _userManager.FindByIdAsync(model.Id);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == model.Id);
+
             if (user == null)
             {
                 TempData["UserError"] = "This user was already deleted by another admin.";
@@ -114,29 +132,21 @@ namespace tickets.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (!RowVersionsMatch(user.RowVersion, model.RowVersion))
-            {
-                TempData["UserError"] = "This user was changed by another admin. Delete cancelled.";
-                return RedirectToAction(nameof(Index));
-            }
+            _db.Entry(user).Property(nameof(AppUser.RowVersion)).OriginalValue = model.RowVersion;
 
-            var result = await _userManager.DeleteAsync(user);
-
-            if (result.Succeeded)
+            try
             {
+                _db.Users.Remove(user);
+                await _db.SaveChangesAsync();
+
                 TempData["UserSuccess"] = "User deleted successfully.";
                 return RedirectToAction(nameof(Index));
             }
-
-            TempData["UserError"] = string.Join(" ", result.Errors.Select(e => e.Description));
-            return RedirectToAction(nameof(Index));
-        }
-
-        private static bool RowVersionsMatch(byte[]? a, byte[]? b)
-        {
-            if (a == null && b == null) return true;
-            if (a == null || b == null) return false;
-            return a.SequenceEqual(b);
+            catch (DbUpdateConcurrencyException)
+            {
+                TempData["UserError"] = "This user was changed or deleted by another admin. Delete cancelled.";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }
