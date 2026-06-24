@@ -16,8 +16,13 @@ namespace tickets.Controllers.Api
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
+            // Only list screenings that haven't started yet — expired ones drop off
+            // the schedule automatically (their reservation history is still kept).
+            var now = DateTime.Now;
+
             var screenings = await _db.Screenings
                 .Include(s => s.Cinema)
+                .Where(s => s.StartTime >= now)
                 .OrderBy(s => s.StartTime)
                 .ToListAsync();
 

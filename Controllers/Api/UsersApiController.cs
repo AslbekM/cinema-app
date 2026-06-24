@@ -32,9 +32,6 @@ namespace tickets.Controllers.Api
                 email = u.Email,
                 nickname = u.UserName,
                 phoneNumber = u.PhoneNumber,
-                // One-way salted hash (PBKDF2). The plaintext password is never stored
-                // and cannot be recovered from this value — shown for transparency only.
-                passwordHash = u.PasswordHash,
                 rowVersion = u.RowVersion != null ? Convert.ToBase64String(u.RowVersion) : null
             });
             return Ok(users);

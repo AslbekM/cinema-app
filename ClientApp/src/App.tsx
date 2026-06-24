@@ -6,6 +6,7 @@ import Home from './pages/Home'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
+import MyTickets from './pages/MyTickets'
 import ScreeningsList from './pages/ScreeningsList'
 import ScreeningDetails from './pages/ScreeningDetails'
 import Users from './pages/admin/Users'
@@ -27,6 +28,14 @@ function AppRoutes() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/my-tickets"
+              element={
+                <ProtectedRoute>
+                  <MyTickets />
                 </ProtectedRoute>
               }
             />

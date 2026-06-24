@@ -64,9 +64,8 @@ export default function Users() {
       )}
 
       <div className="alert alert-info py-2">
-        🔒 Passwords are stored as one-way salted hashes (PBKDF2) — the original password is never
-        saved and cannot be recovered. The hash is shown below for transparency. To change a user's
-        password, use <strong>Edit</strong>.
+        🔒 Passwords are stored as one-way salted hashes and are never displayed. To change a
+        user's password, use <strong>Edit</strong> to set a new one.
       </div>
 
       <div className="table-wrap">
@@ -77,7 +76,6 @@ export default function Users() {
             <th>Email</th>
             <th>Nickname</th>
             <th>Phone</th>
-            <th>Password (hash)</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -90,18 +88,6 @@ export default function Users() {
               <td>{u.email}</td>
               <td>{u.nickname}</td>
               <td>{u.phoneNumber ?? '—'}</td>
-              <td>
-                <code
-                  title={u.passwordHash ?? 'No password set'}
-                  style={{
-                    fontSize: '0.72rem',
-                    color: 'var(--text-muted)',
-                    cursor: u.passwordHash ? 'help' : 'default',
-                  }}
-                >
-                  {u.passwordHash ? `${u.passwordHash.slice(0, 18)}…` : '—'}
-                </code>
-              </td>
               <td>
                 <Link
                   className="btn btn-warning btn-sm me-2"

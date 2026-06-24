@@ -43,6 +43,13 @@ export default function Navbar() {
                 Screenings
               </NavLink>
             </li>
+            {user && (
+              <li className="nav-item">
+                <NavLink className="nav-link" to="/my-tickets">
+                  My Tickets
+                </NavLink>
+              </li>
+            )}
             {user?.isAdmin && (
               <li className="nav-item">
                 <NavLink className="nav-link" to="/admin/users">

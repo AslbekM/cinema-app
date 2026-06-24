@@ -21,11 +21,50 @@ namespace tickets.Controllers.Api
             _userManager = userManager;
         }
 
+        [HttpGet("mine")]
+        public async Task<IActionResult> Mine()
+        {
+            var userId = _userManager.GetUserId(User);
+            if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            var now = DateTime.Now;
+
+            var reservations = await _db.Reservations
+                .Where(r => r.AppUserId == userId)
+                .Include(r => r.Screening).ThenInclude(s => s!.Cinema)
+                .Include(r => r.Seat)
+                .OrderBy(r => r.Screening!.StartTime)
+                .ToListAsync();
+
+            return Ok(reservations.Select(r => new
+            {
+                id = r.Id,
+                screeningId = r.ScreeningId,
+                filmTitle = r.Screening!.FilmTitle,
+                startTime = r.Screening.StartTime,
+                cinemaName = r.Screening.Cinema!.Name,
+                seatId = r.SeatId,
+                rowNumber = r.Seat!.RowNumber,
+                seatNumber = r.Seat.SeatNumber,
+                isPast = r.Screening.StartTime < now
+            }));
+        }
+
         [HttpPost]
         public async Task<IActionResult> Reserve([FromBody] ReservationApiRequest req)
         {
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+            // Validate the screening exists and hasn't already started.
+            var screening = await _db.Screenings.FirstOrDefaultAsync(s => s.Id == req.ScreeningId);
+            if (screening == null) return NotFound(new[] { "Screening not found." });
+            if (screening.StartTime < DateTime.Now)
+                return BadRequest(new[] { "This screening has already started — you can no longer book it." });
+
+            // Validate the seat actually belongs to this screening's cinema.
+            var seatValid = await _db.Seats.AnyAsync(s => s.Id == req.SeatId && s.CinemaId == screening.CinemaId);
+            if (!seatValid) return BadRequest(new[] { "Invalid seat for this screening." });
 
             _db.Reservations.Add(new Reservation
             {
