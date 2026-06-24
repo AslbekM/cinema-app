@@ -55,7 +55,7 @@ export default function Register() {
       <div className="auth-card wide">
         <div className="auth-icon">🍿</div>
         <h2>Create your account</h2>
-        <p className="auth-sub">Join CineWave and start booking in seconds</p>
+        <p className="auth-sub">Join adafcinema and start booking in seconds</p>
         {errors.map((e, i) => (
           <div key={i} className="alert alert-danger py-2">
             {e}

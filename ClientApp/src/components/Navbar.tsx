@@ -18,7 +18,7 @@ export default function Navbar() {
       <div className="container">
         <Link className="navbar-brand" to="/">
           <span className="brand-mark">🎬</span>
-          <span className="brand-text">CineWave</span>
+          <span className="brand-text">adafcinema</span>
         </Link>
         <button
           className="navbar-toggler border-0"
