@@ -90,13 +90,22 @@ namespace tickets.Controllers.Api
             var userId = _userManager.GetUserId(User);
             if (string.IsNullOrEmpty(userId)) return Unauthorized();
 
-            var reservation = await _db.Reservations.FirstOrDefaultAsync(r =>
-                r.ScreeningId == req.ScreeningId &&
-                r.SeatId == req.SeatId &&
-                r.AppUserId == userId);
+            var reservation = await _db.Reservations
+                .Include(r => r.Screening)
+                .FirstOrDefaultAsync(r =>
+                    r.ScreeningId == req.ScreeningId &&
+                    r.SeatId == req.SeatId &&
+                    r.AppUserId == userId);
 
             if (reservation == null)
                 return NotFound(new[] { "Reservation not found." });
+
+            // Can't cancel within 2 hours of the screening start.
+            if (reservation.Screening != null &&
+                reservation.Screening.StartTime - DateTime.Now < TimeSpan.FromHours(2))
+            {
+                return BadRequest(new[] { "Bookings can't be cancelled within 2 hours of the screening." });
+            }
 
             _db.Reservations.Remove(reservation);
             await _db.SaveChangesAsync();

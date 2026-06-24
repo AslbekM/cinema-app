@@ -5,10 +5,13 @@ import { reserveSeat, cancelReservation } from '../api/reservations'
 import { useAuth } from '../contexts/AuthContext'
 import SeatGrid from '../components/SeatGrid'
 import CheckoutModal from '../components/CheckoutModal'
+import { posterFor } from '../posters'
+import { filmMeta } from '../films'
 
 const PRICE_STANDARD = 25
 const PRICE_VIP = 40
 const CURRENCY = 'zł'
+const MAX_SEATS = 8
 
 export default function ScreeningDetails() {
   const { id } = useParams<{ id: string }>()
@@ -53,9 +56,14 @@ export default function ScreeningDetails() {
   const selectedTotal = selected.reduce((sum, id) => sum + seatPrice(id), 0)
 
   const toggleSelect = (seatId: number) => {
-    setSelected((prev) =>
-      prev.includes(seatId) ? prev.filter((x) => x !== seatId) : [...prev, seatId]
-    )
+    setSelected((prev) => {
+      if (prev.includes(seatId)) return prev.filter((x) => x !== seatId)
+      if (prev.length >= MAX_SEATS) {
+        showMsg('danger', `You can book at most ${MAX_SEATS} seats per order.`)
+        return prev
+      }
+      return [...prev, seatId]
+    })
   }
 
   const handleCancel = async (seatId: number) => {
@@ -121,15 +129,36 @@ export default function ScreeningDetails() {
       </Link>
 
       <div className="card mb-4">
-        <div className="card-body">
-          <h2 className="mb-3">{screening.filmTitle}</h2>
-          <div className="d-flex flex-wrap gap-2">
-            <span className="chip">🕑 {new Date(screening.startTime).toLocaleString()}</span>
-            <span className="chip">📍 {screening.cinemaName}</span>
-            <span className="chip">
-              🪑 {screening.rows} rows × {screening.seatsPerRow} seats
-            </span>
-            <span className="chip">💵 Standard {PRICE_STANDARD} · VIP {PRICE_VIP} {CURRENCY}</span>
+        <div className="card-body d-flex gap-4 flex-wrap">
+          {posterFor(screening.filmTitle) && (
+            <img
+              src={posterFor(screening.filmTitle)}
+              alt={screening.filmTitle}
+              style={{ width: 150, borderRadius: 12, objectFit: 'cover', boxShadow: 'var(--shadow-card)' }}
+            />
+          )}
+          <div className="flex-grow-1" style={{ minWidth: 240 }}>
+            <h2 className="mb-2">{screening.filmTitle}</h2>
+            {(() => {
+              const m = filmMeta(screening.filmTitle)
+              return m ? (
+                <div className="d-flex flex-wrap gap-2 mb-2">
+                  <span className="chip">🎭 {m.genre}</span>
+                  <span className="chip">⏱️ {m.duration}</span>
+                  <span className="chip">🔞 {m.rating}</span>
+                </div>
+              ) : null
+            })()}
+            <div className="d-flex flex-wrap gap-2 mb-2">
+              <span className="chip">🕑 {new Date(screening.startTime).toLocaleString()}</span>
+              <span className="chip">📍 {screening.cinemaName}</span>
+              <span className="chip">💵 Standard {PRICE_STANDARD} · VIP {PRICE_VIP} {CURRENCY}</span>
+            </div>
+            {filmMeta(screening.filmTitle)?.synopsis && (
+              <p className="text-muted mb-0" style={{ fontSize: '0.92rem' }}>
+                {filmMeta(screening.filmTitle)!.synopsis}
+              </p>
+            )}
           </div>
         </div>
       </div>
