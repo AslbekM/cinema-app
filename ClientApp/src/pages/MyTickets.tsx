@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { QRCodeSVG } from 'qrcode.react'
 import { getMyReservations, cancelReservation, type MyReservation } from '../api/reservations'
 import Reveal from '../components/Reveal'
 
@@ -128,6 +129,20 @@ export default function MyTickets() {
                 </span>
               ))}
           </div>
+          {!g.isPast && (
+            <div
+              style={{ background: '#fff', padding: 8, borderRadius: 10, lineHeight: 0 }}
+              title="Your e-ticket — scan at the entrance"
+            >
+              <QRCodeSVG
+                value={`adafcinema|S${g.screeningId}|${g.filmTitle}|${new Date(g.startTime).toISOString()}|seats:${g.seats
+                  .map((s) => `${s.rowNumber}-${s.seatNumber}`)
+                  .join(',')}`}
+                size={72}
+                level="M"
+              />
+            </div>
+          )}
         </div>
       </div>
     </Reveal>

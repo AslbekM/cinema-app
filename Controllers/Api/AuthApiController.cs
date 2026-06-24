@@ -86,8 +86,10 @@ namespace tickets.Controllers.Api
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginApiRequest req)
         {
-            var result = await _signInManager.PasswordSignInAsync(req.Nickname, req.Password, false, false);
+            var result = await _signInManager.PasswordSignInAsync(req.Nickname, req.Password, false, lockoutOnFailure: true);
 
+            if (result.IsLockedOut)
+                return BadRequest(new[] { "Account locked due to too many failed attempts. Try again in a few minutes." });
             if (!result.Succeeded)
                 return BadRequest(new[] { "Invalid nickname or password." });
 

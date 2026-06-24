@@ -99,13 +99,18 @@ export default function ScreeningsList() {
                       View Seats
                     </Link>
                     {user?.isAdmin && (
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDelete(s.id, s.filmTitle)}
-                        disabled={deleting === s.id}
-                      >
-                        {deleting === s.id ? '…' : 'Delete'}
-                      </button>
+                      <>
+                        <Link className="btn btn-warning btn-sm" to={`/admin/screenings/${s.id}/edit`}>
+                          Edit
+                        </Link>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDelete(s.id, s.filmTitle)}
+                          disabled={deleting === s.id}
+                        >
+                          {deleting === s.id ? '…' : '✕'}
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>

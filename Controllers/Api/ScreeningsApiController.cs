@@ -103,6 +103,31 @@ namespace tickets.Controllers.Api
         }
 
         [Authorize(Roles = "Admin")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CreateScreeningApiRequest req)
+        {
+            var screening = await _db.Screenings.FindAsync(id);
+            if (screening == null) return NotFound(new[] { "Screening not found." });
+
+            var cinema = await _db.Cinemas.FindAsync(req.CinemaId);
+            if (cinema == null) return BadRequest(new[] { "Cinema not found." });
+
+            screening.FilmTitle = req.FilmTitle;
+            screening.StartTime = req.StartTime;
+            screening.CinemaId = req.CinemaId;
+            await _db.SaveChangesAsync();
+
+            return Ok(new
+            {
+                id = screening.Id,
+                filmTitle = screening.FilmTitle,
+                startTime = screening.StartTime,
+                cinemaId = screening.CinemaId,
+                cinemaName = cinema.Name
+            });
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

@@ -46,11 +46,18 @@ export default function Navbar() {
               </li>
             )}
             {user?.isAdmin && (
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/admin/users">
-                  Users
-                </NavLink>
-              </li>
+              <>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admin/dashboard">
+                    Dashboard
+                  </NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admin/users">
+                    Users
+                  </NavLink>
+                </li>
+              </>
             )}
           </ul>
           <ul className="navbar-nav align-items-lg-center">

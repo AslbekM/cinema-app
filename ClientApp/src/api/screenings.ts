@@ -1,4 +1,4 @@
-import { get, post, del } from './client'
+import { get, post, put, del } from './client'
 
 export interface Screening {
   id: number
@@ -29,6 +29,11 @@ export const getScreening = (id: number) => get<ScreeningDetails>(`/screenings/$
 
 export const createScreening = (data: { filmTitle: string; startTime: string; cinemaId: number }) =>
   post<Screening>('/screenings', data)
+
+export const updateScreening = (
+  id: number,
+  data: { filmTitle: string; startTime: string; cinemaId: number }
+) => put<Screening>(`/screenings/${id}`, data)
 
 export const deleteScreening = (id: number) =>
   del<{ message: string }>(`/screenings/${id}`)

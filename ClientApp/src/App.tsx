@@ -12,6 +12,8 @@ import ScreeningDetails from './pages/ScreeningDetails'
 import Users from './pages/admin/Users'
 import UserEdit from './pages/admin/UserEdit'
 import CreateScreening from './pages/admin/CreateScreening'
+import EditScreening from './pages/admin/EditScreening'
+import Dashboard from './pages/admin/Dashboard'
 
 function AppRoutes() {
   const location = useLocation()
@@ -60,6 +62,22 @@ function AppRoutes() {
               element={
                 <ProtectedRoute adminOnly>
                   <CreateScreening />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/screenings/:id/edit"
+              element={
+                <ProtectedRoute adminOnly>
+                  <EditScreening />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute adminOnly>
+                  <Dashboard />
                 </ProtectedRoute>
               }
             />
