@@ -3,8 +3,10 @@ import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
 import PasswordInput from '../components/PasswordInput'
+import { useI18n } from '../i18n'
 
 export default function Register() {
+  const { t } = useI18n()
   const [form, setForm] = useState({
     firstName: '',
     lastName: '',
@@ -54,8 +56,8 @@ export default function Register() {
     <div className="auth-shell">
       <div className="auth-card wide">
         <div className="auth-icon">🍿</div>
-        <h2>Create your account</h2>
-        <p className="auth-sub">Join adafcinema and start booking in seconds</p>
+        <h2>{t('auth.createAccount')}</h2>
+        <p className="auth-sub">{t('auth.joinSub')}</p>
         {errors.map((e, i) => (
           <div key={i} className="alert alert-danger py-2">
             {e}
@@ -100,12 +102,12 @@ export default function Register() {
             autoComplete="new-password"
           />
           <button type="submit" className="btn btn-success w-100 mt-2" disabled={loading}>
-            {loading ? 'Registering…' : 'Register'}
+            {loading ? `${t('auth.register')}…` : t('auth.register')}
           </button>
           <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.9rem' }}>
-            Already have an account?{' '}
+            {t('auth.haveAccount')}{' '}
             <Link to="/login" className="text-decoration-none">
-              Login
+              {t('auth.login')}
             </Link>
           </p>
         </form>

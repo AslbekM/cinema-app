@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import PasswordInput from '../components/PasswordInput'
+import { useI18n } from '../i18n'
 
 export default function Login() {
+  const { t } = useI18n()
   const [nickname, setNickname] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<string[]>([])
@@ -29,8 +31,8 @@ export default function Login() {
     <div className="auth-shell">
       <div className="auth-card">
         <div className="auth-icon">🎬</div>
-        <h2>Welcome back</h2>
-        <p className="auth-sub">Sign in to reserve your seats</p>
+        <h2>{t('auth.welcomeBack')}</h2>
+        <p className="auth-sub">{t('auth.signInSub')}</p>
         {errors.map((e, i) => (
           <div key={i} className="alert alert-danger py-2">
             {e}
@@ -38,7 +40,7 @@ export default function Login() {
         ))}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Nickname</label>
+            <label className="form-label">{t('auth.nickname')}</label>
             <input
               className="form-control"
               value={nickname}
@@ -48,19 +50,19 @@ export default function Login() {
             />
           </div>
           <PasswordInput
-            label="Password"
+            label={t('auth.password')}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             autoComplete="current-password"
           />
           <button type="submit" className="btn btn-success w-100 mt-2" disabled={loading}>
-            {loading ? 'Logging in…' : 'Login'}
+            {loading ? t('auth.loggingIn') : t('auth.login')}
           </button>
           <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.9rem' }}>
-            Don't have an account?{' '}
+            {t('auth.noAccount')}{' '}
             <Link to="/register" className="text-decoration-none">
-              Register
+              {t('auth.register')}
             </Link>
           </p>
         </form>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import { getMyReservations, cancelReservation, type MyReservation } from '../api/reservations'
 import Reveal from '../components/Reveal'
+import { useI18n } from '../i18n'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
 const GRADIENTS = [
@@ -44,6 +45,7 @@ function groupByScreening(items: MyReservation[]): TicketGroup[] {
 }
 
 export default function MyTickets() {
+  const { t } = useI18n()
   const [reservations, setReservations] = useState<MyReservation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -152,31 +154,31 @@ export default function MyTickets() {
     <div>
       <div className="section-head">
         <div>
-          <h2>My Tickets</h2>
-          <div className="section-sub">Your booked seats and reservation history</div>
+          <h2>{t('tickets.title')}</h2>
+          <div className="section-sub">{t('tickets.sub')}</div>
         </div>
         <Link to="/screenings" className="btn btn-success btn-sm">
-          Book more
+          {t('tickets.bookMore')}
         </Link>
       </div>
 
       {reservations.length === 0 ? (
         <div className="empty-state">
           <span className="emoji">🎟️</span>
-          You haven't booked any seats yet.
+          {t('tickets.none')}
           <div className="mt-3">
             <Link to="/screenings" className="btn btn-success btn-sm">
-              Browse screenings
+              {t('hero.browse')}
             </Link>
           </div>
         </div>
       ) : (
         <>
           <h4 className="mb-3" style={{ fontWeight: 600 }}>
-            Upcoming <span className="text-muted">({upcoming.length})</span>
+            {t('tickets.upcoming')} <span className="text-muted">({upcoming.length})</span>
           </h4>
           {upcoming.length === 0 ? (
-            <p className="text-muted mb-4">No upcoming reservations.</p>
+            <p className="text-muted mb-4">{t('tickets.noUpcoming')}</p>
           ) : (
             <div className="mb-4">
               {upcoming.map((g, i) => (
@@ -188,7 +190,7 @@ export default function MyTickets() {
           {past.length > 0 && (
             <>
               <h4 className="mb-3" style={{ fontWeight: 600, opacity: 0.7 }}>
-                Past <span className="text-muted">({past.length})</span>
+                {t('tickets.past')} <span className="text-muted">({past.length})</span>
               </h4>
               <div style={{ opacity: 0.65 }}>
                 {past.map((g, i) => (

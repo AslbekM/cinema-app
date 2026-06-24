@@ -1,8 +1,10 @@
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
+import { useI18n, LANGS } from '../i18n'
 
 export default function Navbar() {
   const { user, logout } = useAuth()
+  const { t, lang, setLang } = useI18n()
   const navigate = useNavigate()
 
   const handleLogout = async () => {
@@ -35,13 +37,13 @@ export default function Navbar() {
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <NavLink className="nav-link" to="/screenings">
-                Screenings
+                {t('nav.screenings')}
               </NavLink>
             </li>
             {user && (
               <li className="nav-item">
                 <NavLink className="nav-link" to="/my-tickets">
-                  My Tickets
+                  {t('nav.myTickets')}
                 </NavLink>
               </li>
             )}
@@ -49,18 +51,32 @@ export default function Navbar() {
               <>
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/admin/dashboard">
-                    Dashboard
+                    {t('nav.dashboard')}
                   </NavLink>
                 </li>
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/admin/users">
-                    Users
+                    {t('nav.users')}
                   </NavLink>
                 </li>
               </>
             )}
           </ul>
           <ul className="navbar-nav align-items-lg-center">
+            <li className="nav-item me-lg-2">
+              <select
+                className="form-select form-select-sm lang-select"
+                value={lang}
+                onChange={(e) => setLang(e.target.value as typeof lang)}
+                aria-label="Language"
+              >
+                {LANGS.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.flag} {l.code.toUpperCase()}
+                  </option>
+                ))}
+              </select>
+            </li>
             {user ? (
               <>
                 <li className="nav-item">
@@ -70,7 +86,7 @@ export default function Navbar() {
                 </li>
                 <li className="nav-item">
                   <button className="btn btn-outline-secondary btn-sm ms-lg-2" onClick={handleLogout}>
-                    Logout
+                    {t('nav.logout')}
                   </button>
                 </li>
               </>
@@ -78,12 +94,12 @@ export default function Navbar() {
               <>
                 <li className="nav-item">
                   <NavLink className="nav-link" to="/register">
-                    Register
+                    {t('nav.register')}
                   </NavLink>
                 </li>
                 <li className="nav-item">
                   <Link className="btn btn-success btn-sm ms-lg-2" to="/login">
-                    Login
+                    {t('nav.login')}
                   </Link>
                 </li>
               </>

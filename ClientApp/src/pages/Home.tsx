@@ -4,6 +4,7 @@ import { getScreenings, type Screening } from '../api/screenings'
 import Reveal from '../components/Reveal'
 import PosterCarousel from '../components/PosterCarousel'
 import { posterFor } from '../posters'
+import { useI18n } from '../i18n'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
 const GRADIENTS = [
@@ -30,6 +31,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  const { t } = useI18n()
   const [fCinema, setFCinema] = useState('')
   const [fFilm, setFFilm] = useState('')
   const [fDate, setFDate] = useState('')
@@ -86,21 +88,18 @@ export default function Home() {
       <section className="hero">
         <div className="hero-glow" />
         <span className="eyebrow">
-          <span className="dot" /> Now playing in 4K
+          <span className="dot" /> {t('hero.eyebrow')}
         </span>
         <h1>
-          Your night at the movies, <span className="text-gradient">reimagined</span>
+          {t('hero.titlePre')} <span className="text-gradient">{t('hero.titleHi')}</span>
         </h1>
-        <p>
-          Browse screenings, pick the perfect seat on an interactive map, and reserve in seconds —
-          all in one beautifully simple experience.
-        </p>
+        <p>{t('hero.subtitle')}</p>
         <div className="hero-actions">
           <Link to="/screenings" className="btn btn-success btn-lg">
-            Browse screenings
+            {t('hero.browse')}
           </Link>
           <Link to="/register" className="btn btn-outline-secondary btn-lg">
-            Create account
+            {t('hero.createAccount')}
           </Link>
         </div>
 
@@ -109,15 +108,11 @@ export default function Home() {
 
       {/* ---------- Quick Purchase filter bar ---------- */}
       <div className="quick-bar">
-        <div className="quick-bar-label">
-          QUICK
-          <br />
-          PURCHASE
-        </div>
+        <div className="quick-bar-label">{t('quick.label')}</div>
         <div className="quick-field">
-          <label>Cinema</label>
+          <label>{t('quick.cinema')}</label>
           <select value={fCinema} onChange={(e) => setFCinema(e.target.value)}>
-            <option value="">Choose a cinema</option>
+            <option value="">{t('quick.cinemaPh')}</option>
             {cinemas.map((c) => (
               <option key={c} value={c}>
                 {c}
@@ -126,9 +121,9 @@ export default function Home() {
           </select>
         </div>
         <div className="quick-field">
-          <label>Film / Event</label>
+          <label>{t('quick.film')}</label>
           <select value={fFilm} onChange={(e) => setFFilm(e.target.value)}>
-            <option value="">Select a title</option>
+            <option value="">{t('quick.filmPh')}</option>
             {films.map((f) => (
               <option key={f} value={f}>
                 {f}
@@ -137,9 +132,9 @@ export default function Home() {
           </select>
         </div>
         <div className="quick-field">
-          <label>Date</label>
+          <label>{t('quick.date')}</label>
           <select value={fDate} onChange={(e) => setFDate(e.target.value)}>
-            <option value="">Select a date</option>
+            <option value="">{t('quick.datePh')}</option>
             {dates.map(([key, iso]) => (
               <option key={key} value={key}>
                 {dateLabel(iso)}
@@ -149,7 +144,7 @@ export default function Home() {
         </div>
         <div className="quick-search-wrap">
           <button className="btn btn-success" onClick={scrollToResults}>
-            Search
+            {t('quick.search')}
           </button>
         </div>
       </div>
@@ -158,20 +153,18 @@ export default function Home() {
       <Reveal>
         <div className="section-head" ref={resultsRef}>
           <div>
-            <h2>{hasFilter ? 'Search Results' : 'Now Showing'}</h2>
+            <h2>{hasFilter ? t('home.searchResults') : t('home.nowShowing')}</h2>
             <div className="section-sub">
-              {hasFilter
-                ? `${filtered.length} screening${filtered.length === 1 ? '' : 's'} found`
-                : 'Fresh screenings, hand-picked for tonight'}
+              {hasFilter ? `${filtered.length} 🎬` : t('home.nowShowingSub')}
             </div>
           </div>
           {hasFilter ? (
             <button className="btn btn-outline-secondary btn-sm" onClick={reset}>
-              ✕ Clear filters
+              ✕ {t('home.clear')}
             </button>
           ) : (
             <Link to="/screenings" className="btn btn-outline-secondary btn-sm">
-              View all
+              {t('home.viewAll')}
             </Link>
           )}
         </div>
@@ -180,18 +173,18 @@ export default function Home() {
       {loading ? (
         <div className="loader">
           <div className="loader-ring" />
-          <span>Loading screenings…</span>
+          <span>{t('home.loading')}</span>
         </div>
       ) : error ? (
         <div className="alert alert-danger">{error}</div>
       ) : visible.length === 0 ? (
         <div className="empty-state">
           <span className="emoji">🔍</span>
-          {hasFilter ? 'No screenings match your search.' : 'No screenings available right now.'}
+          {hasFilter ? t('home.noResults') : t('home.none')}
           {hasFilter && (
             <div className="mt-3">
               <button className="btn btn-success btn-sm" onClick={reset}>
-                Clear filters
+                {t('home.clear')}
               </button>
             </div>
           )}

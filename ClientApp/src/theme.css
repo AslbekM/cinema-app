@@ -138,6 +138,7 @@ a:hover { color: var(--primary); }
   transition: color 0.2s ease;
 }
 .navbar .nav-link:hover, .navbar .nav-link.active { color: var(--primary) !important; }
+.lang-select { width: auto !important; min-width: 80px; }
 
 /* ============================================================
    Buttons — white pill primary (Paymark signature)

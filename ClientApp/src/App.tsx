@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { I18nProvider } from './i18n'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
@@ -91,10 +92,12 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter basename="/app">
-      <AuthProvider>
-        <Navbar />
-        <AppRoutes />
-      </AuthProvider>
+      <I18nProvider>
+        <AuthProvider>
+          <Navbar />
+          <AppRoutes />
+        </AuthProvider>
+      </I18nProvider>
     </BrowserRouter>
   )
 }
