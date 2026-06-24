@@ -4,6 +4,14 @@ A full-stack cinema ticket reservation system with an ASP.NET Core backend and a
 
 ![Stack](https://img.shields.io/badge/.NET-10-512BD4) ![React](https://img.shields.io/badge/React-18-61DAFB) ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6) ![License](https://img.shields.io/badge/license-MIT-green)
 
+## 🌐 Live Demo
+
+**[▶ Open the live app](https://cinema-app-adaf-b8gpc5gbdjcmf0hc.francecentral-01.azurewebsites.net/app)**
+
+> Hosted on Azure App Service with an Azure SQL database. The database runs on a free
+> serverless tier that auto-pauses when idle, so the **first visit may take ~30–60 seconds**
+> to wake up — after that it's fast.
+
 ---
 
 ## ✨ Features
