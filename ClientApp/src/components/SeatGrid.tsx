@@ -31,6 +31,10 @@ export default function SeatGrid({
   const mySet = new Set(mySeatIds)
   const selectedSet = new Set(selectedSeatIds)
 
+  // The back two rows are VIP (priced higher).
+  const maxRow = seats.reduce((m, s) => Math.max(m, s.rowNumber), 0)
+  const isVip = (rowNumber: number) => rowNumber > maxRow - 2
+
   const rows = seats.reduce<Record<number, Seat[]>>((acc, seat) => {
     ;(acc[seat.rowNumber] ??= []).push(seat)
     return acc
@@ -79,13 +83,14 @@ export default function SeatGrid({
                   )
                 }
                 const selected = selectedSet.has(seat.id)
+                const vip = isVip(seat.rowNumber)
                 return (
                   <button
                     key={seat.id}
-                    className={`seat ${selected ? 'seat-selected' : 'seat-available'}`}
+                    className={`seat ${selected ? 'seat-selected' : 'seat-available'} ${vip ? 'seat-vip' : ''}`}
                     onClick={() => onToggleSelect(seat.id)}
                     disabled={disabled}
-                    title={`${title} — ${selected ? 'selected (click to remove)' : 'available'}`}
+                    title={`${title} — ${vip ? 'VIP, ' : ''}${selected ? 'selected (click to remove)' : 'available'}`}
                   >
                     {seat.seatNumber}
                   </button>
@@ -110,6 +115,10 @@ export default function SeatGrid({
         <span className="legend-item">
           <span className="legend-swatch" style={{ background: 'var(--elevated)' }} />
           Reserved
+        </span>
+        <span className="legend-item">
+          <span className="legend-swatch" style={{ background: 'transparent', outline: '2px solid #f5c451', outlineOffset: '-2px' }} />
+          VIP (back rows)
         </span>
       </div>
     </div>

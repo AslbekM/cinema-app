@@ -6,7 +6,8 @@ import { useAuth } from '../contexts/AuthContext'
 import SeatGrid from '../components/SeatGrid'
 import CheckoutModal from '../components/CheckoutModal'
 
-const PRICE_PER_SEAT = 25
+const PRICE_STANDARD = 25
+const PRICE_VIP = 40
 const CURRENCY = 'zł'
 
 export default function ScreeningDetails() {
@@ -19,6 +20,7 @@ export default function ScreeningDetails() {
   const [selected, setSelected] = useState<number[]>([])
   const [showCheckout, setShowCheckout] = useState(false)
   const [checkoutLabels, setCheckoutLabels] = useState<string[]>([])
+  const [checkoutTotal, setCheckoutTotal] = useState(0)
   const { user } = useAuth()
 
   const load = useCallback(() => {
@@ -41,6 +43,14 @@ export default function ScreeningDetails() {
     const s = screening?.seats.find((x) => x.id === seatId)
     return s ? `Row ${s.rowNumber}, Seat ${s.seatNumber}` : `Seat ${seatId}`
   }
+
+  // Back two rows are VIP (priced higher).
+  const isVip = (rowNumber: number) => !!screening && rowNumber > screening.rows - 2
+  const seatPrice = (seatId: number) => {
+    const s = screening?.seats.find((x) => x.id === seatId)
+    return s && isVip(s.rowNumber) ? PRICE_VIP : PRICE_STANDARD
+  }
+  const selectedTotal = selected.reduce((sum, id) => sum + seatPrice(id), 0)
 
   const toggleSelect = (seatId: number) => {
     setSelected((prev) =>
@@ -85,6 +95,7 @@ export default function ScreeningDetails() {
 
   const openCheckout = () => {
     setCheckoutLabels(selected.map(seatLabel))
+    setCheckoutTotal(selectedTotal)
     setShowCheckout(true)
   }
 
@@ -118,7 +129,7 @@ export default function ScreeningDetails() {
             <span className="chip">
               🪑 {screening.rows} rows × {screening.seatsPerRow} seats
             </span>
-            <span className="chip">💵 {PRICE_PER_SEAT} {CURRENCY} / seat</span>
+            <span className="chip">💵 Standard {PRICE_STANDARD} · VIP {PRICE_VIP} {CURRENCY}</span>
           </div>
         </div>
       </div>
@@ -150,7 +161,7 @@ export default function ScreeningDetails() {
         <div className="summary-bar">
           <div>
             <div className="total">
-              {selected.length * PRICE_PER_SEAT} {CURRENCY}{' '}
+              {selectedTotal} {CURRENCY}{' '}
               <small>· {selected.length} seat{selected.length === 1 ? '' : 's'}</small>
             </div>
             <div className="text-muted" style={{ fontSize: '0.82rem' }}>
@@ -171,7 +182,7 @@ export default function ScreeningDetails() {
       {showCheckout && (
         <CheckoutModal
           seatLabels={checkoutLabels}
-          pricePerSeat={PRICE_PER_SEAT}
+          seatTotal={checkoutTotal}
           currency={CURRENCY}
           filmTitle={screening.filmTitle}
           onConfirm={confirmBooking}

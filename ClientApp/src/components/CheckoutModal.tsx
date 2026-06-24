@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 interface Props {
   seatLabels: string[]
-  pricePerSeat: number
+  seatTotal: number
   currency: string
   filmTitle: string
   /** Performs the actual booking after "payment". Returns an error string on failure. */
@@ -14,9 +14,16 @@ type Stage = 'form' | 'processing' | 'success' | 'error'
 
 const onlyDigits = (s: string) => s.replace(/\D/g, '')
 
+const CONCESSIONS = [
+  { id: 'popcorn', label: 'Popcorn (Large)', emoji: '🍿', price: 18 },
+  { id: 'drink', label: 'Soft Drink', emoji: '🥤', price: 10 },
+  { id: 'combo', label: 'Popcorn + Drink Combo', emoji: '🍿🥤', price: 25 },
+  { id: 'nachos', label: 'Nachos', emoji: '🧀', price: 15 },
+]
+
 export default function CheckoutModal({
   seatLabels,
-  pricePerSeat,
+  seatTotal,
   currency,
   filmTitle,
   onConfirm,
@@ -30,27 +37,28 @@ export default function CheckoutModal({
   const [expiry, setExpiry] = useState('')
   const [cvc, setCvc] = useState('')
   const [touched, setTouched] = useState(false)
+  const [qty, setQty] = useState<Record<string, number>>({})
 
-  const total = seatLabels.length * pricePerSeat
+  const concessionsTotal = CONCESSIONS.reduce((sum, c) => sum + (qty[c.id] ?? 0) * c.price, 0)
+  const total = seatTotal + concessionsTotal
 
   const numberClean = onlyDigits(number)
   const expiryValid = /^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)
   const valid =
     numberClean.length === 16 && name.trim().length >= 2 && expiryValid && onlyDigits(cvc).length >= 3
 
-  const formatNumber = (v: string) =>
-    onlyDigits(v).slice(0, 16).replace(/(.{4})/g, '$1 ').trim()
-
+  const formatNumber = (v: string) => onlyDigits(v).slice(0, 16).replace(/(.{4})/g, '$1 ').trim()
   const formatExpiry = (v: string) => {
     const d = onlyDigits(v).slice(0, 4)
     return d.length >= 3 ? `${d.slice(0, 2)}/${d.slice(2)}` : d
   }
+  const setItemQty = (id: string, delta: number) =>
+    setQty((q) => ({ ...q, [id]: Math.max(0, (q[id] ?? 0) + delta) }))
 
   const handlePay = async () => {
     setTouched(true)
     if (!valid) return
     setStage('processing')
-    // Simulate a payment gateway round-trip.
     await new Promise((r) => setTimeout(r, 1700))
     const err = await onConfirm()
     if (err) {
@@ -68,7 +76,9 @@ export default function CheckoutModal({
           <div className="pay-success">
             <div className="check">✓</div>
             <h3>Payment successful</h3>
-            <p className="text-muted">Your seats for <strong>{filmTitle}</strong> are booked.</p>
+            <p className="text-muted">
+              Your seats for <strong>{filmTitle}</strong> are booked.
+            </p>
             <div className="d-flex flex-wrap gap-2 justify-content-center my-3">
               {seatLabels.map((s) => (
                 <span key={s} className="chip">🎟️ {s}</span>
@@ -88,7 +98,32 @@ export default function CheckoutModal({
               {seatLabels.length} seat{seatLabels.length === 1 ? '' : 's'} for <strong>{filmTitle}</strong>
             </p>
 
-            {/* Live card preview */}
+            {/* Concessions */}
+            <div className="mb-3">
+              <label className="form-label">Add snacks &amp; drinks</label>
+              <div className="d-flex flex-column gap-2">
+                {CONCESSIONS.map((c) => (
+                  <div
+                    key={c.id}
+                    className="d-flex align-items-center gap-2"
+                    style={{ fontSize: '0.92rem' }}
+                  >
+                    <span style={{ width: 30 }}>{c.emoji}</span>
+                    <span className="flex-grow-1">{c.label}</span>
+                    <span className="text-muted">{c.price} {currency}</span>
+                    <button className="btn btn-outline-secondary btn-sm py-0 px-2" onClick={() => setItemQty(c.id, -1)}>
+                      −
+                    </button>
+                    <span style={{ minWidth: 18, textAlign: 'center' }}>{qty[c.id] ?? 0}</span>
+                    <button className="btn btn-outline-secondary btn-sm py-0 px-2" onClick={() => setItemQty(c.id, 1)}>
+                      +
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Card preview */}
             <div className="credit-card">
               <span className="cc-brand">VISA</span>
               <div className="cc-chip" />
@@ -146,23 +181,31 @@ export default function CheckoutModal({
               </div>
             </div>
 
+            {/* Totals breakdown */}
+            <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.88rem' }}>
+              <span>Seats</span>
+              <span>{seatTotal} {currency}</span>
+            </div>
+            {concessionsTotal > 0 && (
+              <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.88rem' }}>
+                <span>Snacks</span>
+                <span>{concessionsTotal} {currency}</span>
+              </div>
+            )}
+            <div className="d-flex justify-content-between mb-3" style={{ fontWeight: 700, fontSize: '1.1rem' }}>
+              <span>Total</span>
+              <span>{total} {currency}</span>
+            </div>
+
             {touched && !valid && (
               <div className="alert alert-danger py-2">Please fill in valid card details.</div>
             )}
             {stage === 'error' && <div className="alert alert-danger py-2">{errorMsg}</div>}
 
-            <button
-              className="btn btn-success w-100"
-              onClick={handlePay}
-              disabled={stage === 'processing'}
-            >
+            <button className="btn btn-success w-100" onClick={handlePay} disabled={stage === 'processing'}>
               {stage === 'processing' ? 'Processing payment…' : `Pay ${total} ${currency}`}
             </button>
-            <button
-              className="btn btn-link w-100 mt-1"
-              onClick={onClose}
-              disabled={stage === 'processing'}
-            >
+            <button className="btn btn-link w-100 mt-1" onClick={onClose} disabled={stage === 'processing'}>
               Cancel
             </button>
             <p className="text-muted text-center mt-2 mb-0" style={{ fontSize: '0.74rem' }}>
