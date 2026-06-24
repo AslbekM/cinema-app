@@ -340,7 +340,10 @@ a:hover { color: var(--primary); }
   align-items: center;
   justify-content: center;
   perspective: 1300px;
+  cursor: grab;
+  touch-action: pan-y;
 }
+.carousel-stage:active { cursor: grabbing; }
 .carousel-card {
   position: absolute;
   width: 200px;
