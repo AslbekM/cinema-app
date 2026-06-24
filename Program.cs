@@ -4,7 +4,14 @@ using tickets.Data;
 using tickets.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://localhost:5095");
+
+// When deployed to the cloud (Azure sets WEBSITE_SITE_NAME), let the host choose
+// the port/binding. Locally, run on a fixed port for the one-click desktop launch.
+var isCloud = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME"));
+if (!isCloud)
+{
+    builder.WebHost.UseUrls("http://localhost:5095");
+}
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
@@ -96,14 +103,26 @@ app.MapControllerRoute(
 app.MapGet("/app", () => Results.Redirect("/app/index.html"));
 app.MapFallbackToFile("/app/{**slug}", "app/index.html");
 
+// Apply any pending EF Core migrations on startup so a fresh cloud database
+// builds all its tables automatically. No-op locally when already up to date.
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDb>();
+    await db.Database.MigrateAsync();
+}
+
 await SeedData.CreateAdminAsync(app);
 await SeedData.SeedScreeningsAsync(app);
 
-app.Lifetime.ApplicationStarted.Register(() =>
+// Auto-open the browser only for the local desktop launch, never on a server.
+if (!isCloud)
 {
-    Task.Delay(1000).ContinueWith(_ =>
-        System.Diagnostics.Process.Start(
-            new System.Diagnostics.ProcessStartInfo("http://localhost:5095/app") { UseShellExecute = true }));
-});
+    app.Lifetime.ApplicationStarted.Register(() =>
+    {
+        Task.Delay(1000).ContinueWith(_ =>
+            System.Diagnostics.Process.Start(
+                new System.Diagnostics.ProcessStartInfo("http://localhost:5095/app") { UseShellExecute = true }));
+    });
+}
 
 app.Run();
