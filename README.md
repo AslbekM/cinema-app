@@ -41,10 +41,6 @@ A full-stack cinema ticket reservation system with an ASP.NET Core backend and a
 
 ### Run it
 
-**Quickest way (Windows):** double-click `start.bat` — it launches the server and opens your browser automatically.
-
-**Or manually:**
-
 ```bash
 # 1. Create the database (applies EF Core migrations)
 dotnet tool install --global dotnet-ef   # first time only
@@ -56,11 +52,14 @@ npm install
 npm run build
 cd ..
 
-# 3. Run the server (seeds a default admin on first run)
+# 3. Run the server (seeds a default admin and sample screenings on first run)
 dotnet run
 ```
 
-Then open **http://localhost:5095/app**
+Then open **http://localhost:5095/app** (the server also opens it automatically).
+
+**Standalone build:** `dotnet publish -c Release -o publish` produces a self-contained
+folder — just run `publish/tickets.exe` to launch the app.
 
 ### Frontend development
 

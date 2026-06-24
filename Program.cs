@@ -97,6 +97,7 @@ app.MapGet("/app", () => Results.Redirect("/app/index.html"));
 app.MapFallbackToFile("/app/{**slug}", "app/index.html");
 
 await SeedData.CreateAdminAsync(app);
+await SeedData.SeedScreeningsAsync(app);
 
 app.Lifetime.ApplicationStarted.Register(() =>
 {

@@ -2,8 +2,19 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getScreenings, deleteScreening, type Screening } from '../api/screenings'
 import { useAuth } from '../contexts/AuthContext'
+import Reveal from '../components/Reveal'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
+const GRADIENTS = [
+  'linear-gradient(135deg, #ff9a85, #ff6f4d)',
+  'linear-gradient(135deg, #7c5cff, #4d3bff)',
+  'linear-gradient(135deg, #34d399, #0ea5a4)',
+  'linear-gradient(135deg, #f472b6, #db2777)',
+  'linear-gradient(135deg, #fbbf24, #f97316)',
+  'linear-gradient(135deg, #60a5fa, #2563eb)',
+]
+const grad = (id: number) => GRADIENTS[id % GRADIENTS.length]
+const poster = (id: number) => POSTERS[id % POSTERS.length]
 
 export default function ScreeningsList() {
   const [screenings, setScreenings] = useState<Screening[]>([])
@@ -69,30 +80,32 @@ export default function ScreeningsList() {
       ) : (
         <div className="screen-grid">
           {screenings.map((s, i) => (
-            <div key={s.id} className="movie-card" style={{ animationDelay: `${i * 50}ms` }}>
-              <div className="movie-poster">
-                <span>{POSTERS[s.id % POSTERS.length]}</span>
-              </div>
-              <div className="movie-body">
-                <div className="movie-title">{s.filmTitle}</div>
-                <div className="movie-meta">🕑 {new Date(s.startTime).toLocaleString()}</div>
-                <div className="movie-meta">📍 {s.cinemaName}</div>
-                <div className="movie-actions">
-                  <Link className="btn btn-success btn-sm flex-grow-1" to={`/screenings/${s.id}`}>
-                    View Seats
-                  </Link>
-                  {user?.isAdmin && (
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDelete(s.id, s.filmTitle)}
-                      disabled={deleting === s.id}
-                    >
-                      {deleting === s.id ? '…' : 'Delete'}
-                    </button>
-                  )}
+            <Reveal key={s.id} delay={i * 45}>
+              <div className="movie-card h-100">
+                <div className="movie-poster" style={{ background: grad(s.id) }}>
+                  <span className="emoji">{poster(s.id)}</span>
+                </div>
+                <div className="movie-body">
+                  <div className="movie-title">{s.filmTitle}</div>
+                  <div className="movie-meta">🕑 {new Date(s.startTime).toLocaleString()}</div>
+                  <div className="movie-meta">📍 {s.cinemaName}</div>
+                  <div className="movie-actions">
+                    <Link className="btn btn-success btn-sm flex-grow-1" to={`/screenings/${s.id}`}>
+                      View Seats
+                    </Link>
+                    {user?.isAdmin && (
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(s.id, s.filmTitle)}
+                        disabled={deleting === s.id}
+                      >
+                        {deleting === s.id ? '…' : 'Delete'}
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       )}

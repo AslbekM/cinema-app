@@ -7,6 +7,7 @@ export interface UserInfo {
   email: string
   nickname: string
   phoneNumber?: string
+  passwordHash?: string
   rowVersion?: string
 }
 
