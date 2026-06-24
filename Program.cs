@@ -4,6 +4,7 @@ using tickets.Data;
 using tickets.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://localhost:5095");
 
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(options =>
@@ -75,7 +76,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 if (app.Environment.IsDevelopment())
@@ -97,5 +97,12 @@ app.MapGet("/app", () => Results.Redirect("/app/index.html"));
 app.MapFallbackToFile("/app/{**slug}", "app/index.html");
 
 await SeedData.CreateAdminAsync(app);
+
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    Task.Delay(1000).ContinueWith(_ =>
+        System.Diagnostics.Process.Start(
+            new System.Diagnostics.ProcessStartInfo("http://localhost:5095/app") { UseShellExecute = true }));
+});
 
 app.Run();

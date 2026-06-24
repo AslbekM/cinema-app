@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { getScreenings, type Screening } from '../api/screenings'
 
+const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
+
 export default function Home() {
   const [screenings, setScreenings] = useState<Screening[]>([])
   const [loading, setLoading] = useState(true)
@@ -14,45 +16,72 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
-  if (loading)
-    return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-success" role="status" />
-      </div>
-    )
-
-  if (error) return <div className="alert alert-danger">{error}</div>
-
   return (
     <div>
-      <h2 className="mb-4">Now Showing</h2>
-      {screenings.length === 0 ? (
-        <p className="text-muted">No screenings available.</p>
+      <section className="hero">
+        <span className="hero-eyebrow">✦ Now playing in 4K</span>
+        <h1>
+          Book the best seats <span className="grad">before the lights dim</span>
+        </h1>
+        <p>
+          Pick your screening, choose your perfect spot on an interactive seat map, and reserve in
+          seconds. Your night at the movies, reimagined.
+        </p>
+        <div className="d-flex gap-2 mt-4 flex-wrap">
+          <Link to="/screenings" className="btn btn-success">
+            Browse screenings →
+          </Link>
+          <Link to="/register" className="btn btn-outline-secondary">
+            Create account
+          </Link>
+        </div>
+      </section>
+
+      <div className="section-head">
+        <div>
+          <h2>Now Showing</h2>
+          <div className="section-sub">Fresh screenings, hand-picked for tonight</div>
+        </div>
+        <Link to="/screenings" className="btn btn-outline-secondary btn-sm">
+          View all
+        </Link>
+      </div>
+
+      {loading ? (
+        <div className="loader">
+          <div className="loader-ring" />
+          <span>Loading screenings…</span>
+        </div>
+      ) : error ? (
+        <div className="alert alert-danger">{error}</div>
+      ) : screenings.length === 0 ? (
+        <div className="empty-state">
+          <span className="emoji">🎟️</span>
+          No screenings available right now. Check back soon!
+        </div>
       ) : (
-        <table className="table table-hover">
-          <thead className="table-dark">
-            <tr>
-              <th>Film</th>
-              <th>Date &amp; Time</th>
-              <th>Cinema</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {screenings.map((s) => (
-              <tr key={s.id}>
-                <td className="fw-semibold">{s.filmTitle}</td>
-                <td>{new Date(s.startTime).toLocaleString()}</td>
-                <td>{s.cinemaName}</td>
-                <td>
-                  <Link className="btn btn-success btn-sm" to={`/screenings/${s.id}`}>
-                    Seats
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="screen-grid">
+          {screenings.slice(0, 8).map((s, i) => (
+            <Link
+              to={`/screenings/${s.id}`}
+              key={s.id}
+              className="movie-card text-decoration-none"
+              style={{ animationDelay: `${i * 60}ms` }}
+            >
+              <div className="movie-poster">
+                <span>{POSTERS[s.id % POSTERS.length]}</span>
+              </div>
+              <div className="movie-body">
+                <div className="movie-title">{s.filmTitle}</div>
+                <div className="movie-meta">🕑 {new Date(s.startTime).toLocaleString()}</div>
+                <div className="movie-meta">📍 {s.cinemaName}</div>
+                <div className="movie-actions">
+                  <span className="btn btn-success btn-sm w-100">Select seats</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       )}
     </div>
   )

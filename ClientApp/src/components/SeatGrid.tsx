@@ -35,100 +35,82 @@ export default function SeatGrid({
   }, {})
 
   return (
-    <div>
-      <div className="text-center mb-3">
-        <div
-          className="p-2 text-white fw-semibold rounded"
-          style={{ backgroundColor: '#333', maxWidth: '300px', margin: '0 auto' }}
-        >
-          SCREEN
-        </div>
-      </div>
+    <div className="seatmap">
+      <div className="screen-bar" />
+      <div className="screen-label">Screen</div>
 
       {Object.entries(rows)
         .sort(([a], [b]) => Number(a) - Number(b))
         .map(([row, rowSeats]) => (
-          <div key={row} className="d-flex justify-content-center align-items-center gap-1 mb-1">
-            <span className="text-muted me-2" style={{ minWidth: '20px', textAlign: 'right' }}>
-              {row}
-            </span>
-            {rowSeats.map((seat) => {
-              const ismine = mySet.has(seat.id)
-              const isReserved = reservedSet.has(seat.id)
+          <div key={row} className="seat-row">
+            <span className="row-label">{row}</span>
+            {rowSeats
+              .sort((a, b) => a.seatNumber - b.seatNumber)
+              .map((seat) => {
+                const ismine = mySet.has(seat.id)
+                const isReserved = reservedSet.has(seat.id)
+                const title = `Row ${seat.rowNumber}, Seat ${seat.seatNumber}`
 
-              if (ismine) {
-                return (
+                if (ismine) {
+                  return (
+                    <button
+                      key={seat.id}
+                      className="seat seat-mine"
+                      onClick={() => onCancel(seat.id)}
+                      disabled={disabled}
+                      title={`${title} — your reservation. Click to cancel.`}
+                    >
+                      {seat.seatNumber}
+                    </button>
+                  )
+                }
+                if (isReserved) {
+                  return (
+                    <button
+                      key={seat.id}
+                      className="seat seat-reserved"
+                      disabled
+                      title={`${title} — reserved`}
+                    >
+                      {seat.seatNumber}
+                    </button>
+                  )
+                }
+                return isLoggedIn ? (
                   <button
                     key={seat.id}
-                    className="btn btn-warning btn-sm p-0"
-                    style={{ width: '34px', height: '34px', fontSize: '11px' }}
-                    onClick={() => onCancel(seat.id)}
+                    className="seat seat-available"
+                    onClick={() => onReserve(seat.id)}
                     disabled={disabled}
-                    title={`Row ${seat.rowNumber}, Seat ${seat.seatNumber} — your reservation. Click to cancel.`}
+                    title={`${title} — available`}
                   >
                     {seat.seatNumber}
                   </button>
-                )
-              }
-              if (isReserved) {
-                return (
-                  <button
+                ) : (
+                  <Link
                     key={seat.id}
-                    className="btn btn-danger btn-sm p-0"
-                    style={{ width: '34px', height: '34px', fontSize: '11px' }}
-                    disabled
-                    title={`Row ${seat.rowNumber}, Seat ${seat.seatNumber} — reserved`}
+                    to="/login"
+                    className="seat seat-locked"
+                    title={`${title} — log in to reserve`}
                   >
                     {seat.seatNumber}
-                  </button>
+                  </Link>
                 )
-              }
-              return isLoggedIn ? (
-                <button
-                  key={seat.id}
-                  className="btn btn-success btn-sm p-0"
-                  style={{ width: '34px', height: '34px', fontSize: '11px' }}
-                  onClick={() => onReserve(seat.id)}
-                  disabled={disabled}
-                  title={`Row ${seat.rowNumber}, Seat ${seat.seatNumber} — available`}
-                >
-                  {seat.seatNumber}
-                </button>
-              ) : (
-                <Link
-                  key={seat.id}
-                  to="/login"
-                  className="btn btn-outline-success btn-sm p-0"
-                  style={{ width: '34px', height: '34px', fontSize: '11px', lineHeight: '32px' }}
-                  title={`Row ${seat.rowNumber}, Seat ${seat.seatNumber} — log in to reserve`}
-                >
-                  {seat.seatNumber}
-                </Link>
-              )
-            })}
+              })}
           </div>
         ))}
 
-      <div className="d-flex flex-wrap gap-3 mt-4 justify-content-center">
-        <span className="d-flex align-items-center gap-1">
-          <span
-            className="btn btn-success btn-sm p-0"
-            style={{ width: '20px', height: '20px', pointerEvents: 'none' }}
-          />
+      <div className="legend">
+        <span className="legend-item">
+          <span className="legend-swatch" style={{ background: 'var(--emerald-grad)' }} />
           Available
         </span>
-        <span className="d-flex align-items-center gap-1">
-          <span
-            className="btn btn-warning btn-sm p-0"
-            style={{ width: '20px', height: '20px', pointerEvents: 'none' }}
-          />
+        <span className="legend-item">
+          <span className="legend-swatch" style={{ background: 'var(--gold-grad)' }} />
           My reservation
         </span>
-        <span className="d-flex align-items-center gap-1">
-          <span
-            className="btn btn-danger btn-sm p-0"
-            style={{ width: '20px', height: '20px', pointerEvents: 'none' }}
-          />
+        <span className="legend-item">
+          <span className="legend-swatch" style={{ background: 'rgba(255,255,255,0.1)' }} />
           Reserved
         </span>
       </div>

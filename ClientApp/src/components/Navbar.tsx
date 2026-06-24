@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function Navbar() {
@@ -14,13 +14,14 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark" style={{ backgroundColor: '#3CB371' }}>
+    <nav className="navbar navbar-expand-lg navbar-dark">
       <div className="container">
-        <Link className="navbar-brand fw-bold" to="/">
-          tickets
+        <Link className="navbar-brand" to="/">
+          <span className="brand-mark">🎬</span>
+          <span className="brand-text">CineWave</span>
         </Link>
         <button
-          className="navbar-toggler"
+          className="navbar-toggler border-0"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navMenu"
@@ -33,37 +34,33 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navMenu">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <Link className="nav-link" to="/">
+              <NavLink className="nav-link" to="/" end>
                 Home
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/screenings">
+              <NavLink className="nav-link" to="/screenings">
                 Screenings
-              </Link>
+              </NavLink>
             </li>
             {user?.isAdmin && (
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/users">
+                <NavLink className="nav-link" to="/admin/users">
                   Users
-                </Link>
+                </NavLink>
               </li>
             )}
           </ul>
-          <ul className="navbar-nav">
+          <ul className="navbar-nav align-items-lg-center">
             {user ? (
               <>
                 <li className="nav-item">
                   <Link className="nav-link" to="/profile">
-                    Hello, {user.nickname}
+                    <span className="chip">👤 {user.nickname}</span>
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <button
-                    className="btn btn-link nav-link"
-                    style={{ color: 'rgba(255,255,255,.85)' }}
-                    onClick={handleLogout}
-                  >
+                  <button className="btn btn-outline-secondary btn-sm ms-lg-2" onClick={handleLogout}>
                     Logout
                   </button>
                 </li>
@@ -71,12 +68,12 @@ export default function Navbar() {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/register">
+                  <NavLink className="nav-link" to="/register">
                     Register
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/login">
+                  <Link className="btn btn-success btn-sm ms-lg-2" to="/login">
                     Login
                   </Link>
                 </li>

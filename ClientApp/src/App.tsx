@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -12,13 +12,11 @@ import Users from './pages/admin/Users'
 import UserEdit from './pages/admin/UserEdit'
 import CreateScreening from './pages/admin/CreateScreening'
 
-export default function App() {
+function AppRoutes() {
+  const location = useLocation()
   return (
-    <BrowserRouter basename="/app">
-      <AuthProvider>
-        <Navbar />
-        <div className="container mt-4">
-          <Routes>
+    <div className="container mt-4 mb-5 page-enter" key={location.pathname}>
+      <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -56,8 +54,17 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-          </Routes>
-        </div>
+      </Routes>
+    </div>
+  )
+}
+
+export default function App() {
+  return (
+    <BrowserRouter basename="/app">
+      <AuthProvider>
+        <Navbar />
+        <AppRoutes />
       </AuthProvider>
     </BrowserRouter>
   )

@@ -87,15 +87,23 @@ export default function Profile() {
 
   if (!profile)
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-success" role="status" />
+      <div className="loader">
+        <div className="loader-ring" />
+        <span>Loading profile…</span>
       </div>
     )
 
   return (
     <div className="row justify-content-center">
-      <div className="col-md-6">
-        <h2 className="mb-4">My Profile</h2>
+      <div className="col-md-7">
+        <div className="section-head">
+          <div>
+            <h2>My Profile</h2>
+            <div className="section-sub">Manage your account details</div>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-body">
 
         {success && (
           <div className="alert alert-success alert-dismissible" role="alert">
@@ -143,6 +151,8 @@ export default function Profile() {
             {loading ? 'Saving…' : 'Save Changes'}
           </button>
         </form>
+          </div>
+        </div>
       </div>
     </div>
   )

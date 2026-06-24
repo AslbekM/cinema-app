@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { getScreenings, deleteScreening, type Screening } from '../api/screenings'
 import { useAuth } from '../contexts/AuthContext'
 
+const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
+
 export default function ScreeningsList() {
   const [screenings, setScreenings] = useState<Screening[]>([])
   const [loading, setLoading] = useState(true)
@@ -35,8 +37,9 @@ export default function ScreeningsList() {
 
   if (loading)
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-success" role="status" />
+      <div className="loader">
+        <div className="loader-ring" />
+        <span>Loading screenings…</span>
       </div>
     )
 
@@ -44,8 +47,13 @@ export default function ScreeningsList() {
 
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2>Screenings</h2>
+      <div className="section-head">
+        <div>
+          <h2>Screenings</h2>
+          <div className="section-sub">
+            {screenings.length} screening{screenings.length === 1 ? '' : 's'} available
+          </div>
+        </div>
         {user?.isAdmin && (
           <Link className="btn btn-success" to="/admin/screenings/create">
             + Create Screening
@@ -54,31 +62,26 @@ export default function ScreeningsList() {
       </div>
 
       {screenings.length === 0 ? (
-        <p className="text-muted">No screenings available.</p>
+        <div className="empty-state">
+          <span className="emoji">🎟️</span>
+          No screenings available.
+        </div>
       ) : (
-        <table className="table table-hover">
-          <thead className="table-dark">
-            <tr>
-              <th>Film</th>
-              <th>Date &amp; Time</th>
-              <th>Cinema</th>
-              <th>Seats</th>
-              {user?.isAdmin && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {screenings.map((s) => (
-              <tr key={s.id}>
-                <td className="fw-semibold">{s.filmTitle}</td>
-                <td>{new Date(s.startTime).toLocaleString()}</td>
-                <td>{s.cinemaName}</td>
-                <td>
-                  <Link className="btn btn-success btn-sm" to={`/screenings/${s.id}`}>
+        <div className="screen-grid">
+          {screenings.map((s, i) => (
+            <div key={s.id} className="movie-card" style={{ animationDelay: `${i * 50}ms` }}>
+              <div className="movie-poster">
+                <span>{POSTERS[s.id % POSTERS.length]}</span>
+              </div>
+              <div className="movie-body">
+                <div className="movie-title">{s.filmTitle}</div>
+                <div className="movie-meta">🕑 {new Date(s.startTime).toLocaleString()}</div>
+                <div className="movie-meta">📍 {s.cinemaName}</div>
+                <div className="movie-actions">
+                  <Link className="btn btn-success btn-sm flex-grow-1" to={`/screenings/${s.id}`}>
                     View Seats
                   </Link>
-                </td>
-                {user?.isAdmin && (
-                  <td>
+                  {user?.isAdmin && (
                     <button
                       className="btn btn-danger btn-sm"
                       onClick={() => handleDelete(s.id, s.filmTitle)}
@@ -86,12 +89,12 @@ export default function ScreeningsList() {
                     >
                       {deleting === s.id ? '…' : 'Delete'}
                     </button>
-                  </td>
-                )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   )

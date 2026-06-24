@@ -51,9 +51,11 @@ export default function Register() {
   }
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-6">
-        <h2 className="mb-4">Register</h2>
+    <div className="auth-shell">
+      <div className="auth-card wide">
+        <div className="auth-icon">🍿</div>
+        <h2>Create your account</h2>
+        <p className="auth-sub">Join CineWave and start booking in seconds</p>
         {errors.map((e, i) => (
           <div key={i} className="alert alert-danger py-2">
             {e}
@@ -97,12 +99,15 @@ export default function Register() {
             required
             autoComplete="new-password"
           />
-          <button type="submit" className="btn btn-success" disabled={loading}>
+          <button type="submit" className="btn btn-success w-100 mt-2" disabled={loading}>
             {loading ? 'Registering…' : 'Register'}
           </button>
-          <Link to="/login" className="ms-3 text-decoration-none">
-            Already have an account? Login
-          </Link>
+          <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.9rem' }}>
+            Already have an account?{' '}
+            <Link to="/login" className="text-decoration-none">
+              Login
+            </Link>
+          </p>
         </form>
       </div>
     </div>

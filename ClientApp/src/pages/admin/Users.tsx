@@ -39,8 +39,9 @@ export default function Users() {
 
   if (loading)
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-success" role="status" />
+      <div className="loader">
+        <div className="loader-ring" />
+        <span>Loading users…</span>
       </div>
     )
 
@@ -48,7 +49,12 @@ export default function Users() {
 
   return (
     <div>
-      <h2 className="mb-4">Users</h2>
+      <div className="section-head">
+        <div>
+          <h2>Users</h2>
+          <div className="section-sub">{users.length} registered</div>
+        </div>
+      </div>
 
       {msg && (
         <div className={`alert alert-${msg.type} alert-dismissible py-2`} role="alert">
@@ -57,7 +63,8 @@ export default function Users() {
         </div>
       )}
 
-      <table className="table table-hover">
+      <div className="table-wrap">
+      <table className="table table-hover mb-0">
         <thead className="table-dark">
           <tr>
             <th>Name</th>
@@ -97,6 +104,7 @@ export default function Users() {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   )
 }

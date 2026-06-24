@@ -63,8 +63,9 @@ export default function ScreeningDetails() {
 
   if (loading)
     return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-success" role="status" />
+      <div className="loader">
+        <div className="loader-ring" />
+        <span>Loading seat map…</span>
       </div>
     )
 
@@ -81,14 +82,17 @@ export default function ScreeningDetails() {
         ← Back
       </Link>
 
-      <div className="mb-4">
-        <h2>{screening.filmTitle}</h2>
-        <p className="text-muted mb-1">
-          <strong>Date &amp; Time:</strong> {new Date(screening.startTime).toLocaleString()}
-        </p>
-        <p className="text-muted mb-0">
-          <strong>Cinema:</strong> {screening.cinemaName} ({screening.rows} rows × {screening.seatsPerRow} seats)
-        </p>
+      <div className="card mb-4">
+        <div className="card-body">
+          <h2 className="mb-3">{screening.filmTitle}</h2>
+          <div className="d-flex flex-wrap gap-2">
+            <span className="chip">🕑 {new Date(screening.startTime).toLocaleString()}</span>
+            <span className="chip">📍 {screening.cinemaName}</span>
+            <span className="chip">
+              🪑 {screening.rows} rows × {screening.seatsPerRow} seats
+            </span>
+          </div>
+        </div>
       </div>
 
       {actionMsg && (

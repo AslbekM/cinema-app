@@ -26,9 +26,11 @@ export default function Login() {
   }
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-5">
-        <h2 className="mb-4">Login</h2>
+    <div className="auth-shell">
+      <div className="auth-card">
+        <div className="auth-icon">🎬</div>
+        <h2>Welcome back</h2>
+        <p className="auth-sub">Sign in to reserve your seats</p>
         {errors.map((e, i) => (
           <div key={i} className="alert alert-danger py-2">
             {e}
@@ -52,12 +54,15 @@ export default function Login() {
             required
             autoComplete="current-password"
           />
-          <button type="submit" className="btn btn-success" disabled={loading}>
+          <button type="submit" className="btn btn-success w-100 mt-2" disabled={loading}>
             {loading ? 'Logging in…' : 'Login'}
           </button>
-          <Link to="/register" className="ms-3 text-decoration-none">
-            Don't have an account? Register
-          </Link>
+          <p className="text-center text-muted mt-3 mb-0" style={{ fontSize: '0.9rem' }}>
+            Don't have an account?{' '}
+            <Link to="/register" className="text-decoration-none">
+              Register
+            </Link>
+          </p>
         </form>
       </div>
     </div>
