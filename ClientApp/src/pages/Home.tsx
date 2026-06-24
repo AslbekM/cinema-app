@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { getScreenings, type Screening } from '../api/screenings'
 import Reveal from '../components/Reveal'
+import PosterCarousel from '../components/PosterCarousel'
+import { posterFor } from '../posters'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
 const GRADIENTS = [
@@ -70,7 +72,13 @@ export default function Home() {
   }
   const scrollToResults = () => resultsRef.current?.scrollIntoView({ behavior: 'smooth' })
 
-  const featured = screenings.slice(0, 5)
+  const carouselItems = screenings.slice(0, 10).map((s) => ({
+    id: s.id,
+    title: s.filmTitle,
+    img: posterFor(s.filmTitle),
+    emoji: poster(s.id),
+    gradient: grad(s.id),
+  }))
 
   return (
     <div>
@@ -96,23 +104,7 @@ export default function Home() {
           </Link>
         </div>
 
-        {featured.length > 0 && (
-          <div className="poster-stage poster-float">
-            {featured.map((s, i) => {
-              const pos = ['far-left', 'left', 'center', 'right', 'far-right'][i]
-              return (
-                <div
-                  key={s.id}
-                  className={`poster-card ${pos}`}
-                  style={{ background: grad(s.id) }}
-                  title={s.filmTitle}
-                >
-                  {poster(s.id)}
-                </div>
-              )
-            })}
-          </div>
-        )}
+        {carouselItems.length > 0 && <PosterCarousel items={carouselItems} />}
       </section>
 
       {/* ---------- Quick Purchase filter bar ---------- */}
@@ -210,7 +202,11 @@ export default function Home() {
             <Reveal key={s.id} delay={i * 60}>
               <Link to={`/screenings/${s.id}`} className="movie-card h-100">
                 <div className="movie-poster" style={{ background: grad(s.id) }}>
-                  <span className="emoji">{poster(s.id)}</span>
+                  {posterFor(s.filmTitle) ? (
+                    <img className="poster-img" src={posterFor(s.filmTitle)} alt={s.filmTitle} loading="lazy" />
+                  ) : (
+                    <span className="emoji">{poster(s.id)}</span>
+                  )}
                 </div>
                 <div className="movie-body">
                   <div className="movie-title">{s.filmTitle}</div>

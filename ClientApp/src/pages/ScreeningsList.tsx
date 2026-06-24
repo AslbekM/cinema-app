@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { getScreenings, deleteScreening, type Screening } from '../api/screenings'
 import { useAuth } from '../contexts/AuthContext'
 import Reveal from '../components/Reveal'
+import { posterFor } from '../posters'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
 const GRADIENTS = [
@@ -83,7 +84,11 @@ export default function ScreeningsList() {
             <Reveal key={s.id} delay={i * 45}>
               <div className="movie-card h-100">
                 <div className="movie-poster" style={{ background: grad(s.id) }}>
-                  <span className="emoji">{poster(s.id)}</span>
+                  {posterFor(s.filmTitle) ? (
+                    <img className="poster-img" src={posterFor(s.filmTitle)} alt={s.filmTitle} loading="lazy" />
+                  ) : (
+                    <span className="emoji">{poster(s.id)}</span>
+                  )}
                 </div>
                 <div className="movie-body">
                   <div className="movie-title">{s.filmTitle}</div>

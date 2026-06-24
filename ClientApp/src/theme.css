@@ -330,6 +330,60 @@ a:hover { color: var(--primary); }
 .poster-float { animation: floaty 6s ease-in-out infinite; }
 
 /* ============================================================
+   Poster carousel (auto + manual coverflow)
+   ============================================================ */
+.carousel { position: relative; margin-top: 3.2rem; }
+.carousel-stage {
+  position: relative;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1300px;
+}
+.carousel-card {
+  position: absolute;
+  width: 200px;
+  height: 290px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lift);
+  background: #111;
+  cursor: pointer;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.6s ease, box-shadow 0.4s ease;
+  will-change: transform, opacity;
+}
+.carousel-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carousel-card .poster-emoji { width: 100%; height: 100%; display: grid; place-items: center; font-size: 3.6rem; }
+.carousel-card.is-active { box-shadow: var(--shadow-lift), var(--shadow-glow); }
+.carousel-caption {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 1.6rem 0.8rem 0.8rem;
+  font-weight: 600; font-size: 1rem; text-align: center; color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
+}
+.carousel-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 20;
+  width: 46px; height: 46px; border-radius: 50%;
+  border: 1px solid var(--border-strong);
+  background: rgba(20, 20, 20, 0.7); color: #fff;
+  font-size: 1.7rem; line-height: 1; cursor: pointer;
+  backdrop-filter: blur(8px);
+  display: grid; place-items: center;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.carousel-arrow:hover { background: var(--primary); color: #0e0e0e; transform: translateY(-50%) scale(1.08); }
+.carousel-arrow.left { left: 0.4rem; }
+.carousel-arrow.right { right: 0.4rem; }
+.carousel-dots { display: flex; gap: 0.5rem; justify-content: center; margin-top: 1.6rem; }
+.carousel-dots .dot {
+  width: 9px; height: 9px; border-radius: 50%; border: none; padding: 0;
+  background: var(--border-strong); cursor: pointer; transition: all 0.25s ease;
+}
+.carousel-dots .dot.active { background: var(--primary); width: 26px; border-radius: 5px; }
+
+/* ============================================================
    Quick Purchase filter bar
    ============================================================ */
 .quick-bar {
@@ -413,6 +467,9 @@ a:hover { color: var(--primary); }
 }
 .movie-poster .emoji { font-size: 3.4rem; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.55)); transition: transform 0.4s ease; z-index: 1; }
 .movie-card:hover .movie-poster .emoji { transform: scale(1.16) rotate(-4deg); }
+.movie-poster .poster-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+.movie-card:hover .movie-poster .poster-img { transform: scale(1.07); }
+.movie-poster { height: 230px; }
 .movie-poster::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(14,14,14,0.85), transparent 60%); }
 .movie-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
 .movie-title { font-weight: 600; font-size: 1.18rem; color: #fff; letter-spacing: -0.02em; }
