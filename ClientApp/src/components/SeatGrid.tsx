@@ -10,9 +10,9 @@ interface Props {
   seats: Seat[]
   reservedSeatIds: number[]
   mySeatIds: number[]
+  selectedSeatIds: number[]
   isLoggedIn: boolean
-  screeningId: number
-  onReserve: (seatId: number) => void
+  onToggleSelect: (seatId: number) => void
   onCancel: (seatId: number) => void
   disabled?: boolean
 }
@@ -21,13 +21,15 @@ export default function SeatGrid({
   seats,
   reservedSeatIds,
   mySeatIds,
+  selectedSeatIds,
   isLoggedIn,
-  onReserve,
+  onToggleSelect,
   onCancel,
   disabled,
 }: Props) {
   const reservedSet = new Set(reservedSeatIds)
   const mySet = new Set(mySeatIds)
+  const selectedSet = new Set(selectedSeatIds)
 
   const rows = seats.reduce<Record<number, Seat[]>>((acc, seat) => {
     ;(acc[seat.rowNumber] ??= []).push(seat)
@@ -47,54 +49,46 @@ export default function SeatGrid({
             {rowSeats
               .sort((a, b) => a.seatNumber - b.seatNumber)
               .map((seat) => {
-                const ismine = mySet.has(seat.id)
-                const isReserved = reservedSet.has(seat.id)
                 const title = `Row ${seat.rowNumber}, Seat ${seat.seatNumber}`
 
-                if (ismine) {
+                if (mySet.has(seat.id)) {
                   return (
                     <button
                       key={seat.id}
                       className="seat seat-mine"
                       onClick={() => onCancel(seat.id)}
                       disabled={disabled}
-                      title={`${title} — your reservation. Click to cancel.`}
+                      title={`${title} — booked by you. Click to cancel.`}
                     >
                       {seat.seatNumber}
                     </button>
                   )
                 }
-                if (isReserved) {
+                if (reservedSet.has(seat.id)) {
                   return (
-                    <button
-                      key={seat.id}
-                      className="seat seat-reserved"
-                      disabled
-                      title={`${title} — reserved`}
-                    >
+                    <button key={seat.id} className="seat seat-reserved" disabled title={`${title} — reserved`}>
                       {seat.seatNumber}
                     </button>
                   )
                 }
-                return isLoggedIn ? (
+                if (!isLoggedIn) {
+                  return (
+                    <Link key={seat.id} to="/login" className="seat seat-locked" title={`${title} — log in to book`}>
+                      {seat.seatNumber}
+                    </Link>
+                  )
+                }
+                const selected = selectedSet.has(seat.id)
+                return (
                   <button
                     key={seat.id}
-                    className="seat seat-available"
-                    onClick={() => onReserve(seat.id)}
+                    className={`seat ${selected ? 'seat-selected' : 'seat-available'}`}
+                    onClick={() => onToggleSelect(seat.id)}
                     disabled={disabled}
-                    title={`${title} — available`}
+                    title={`${title} — ${selected ? 'selected (click to remove)' : 'available'}`}
                   >
                     {seat.seatNumber}
                   </button>
-                ) : (
-                  <Link
-                    key={seat.id}
-                    to="/login"
-                    className="seat seat-locked"
-                    title={`${title} — log in to reserve`}
-                  >
-                    {seat.seatNumber}
-                  </Link>
                 )
               })}
           </div>
@@ -102,15 +96,19 @@ export default function SeatGrid({
 
       <div className="legend">
         <span className="legend-item">
-          <span className="legend-swatch" style={{ background: 'var(--emerald-grad)' }} />
+          <span className="legend-swatch" style={{ background: 'linear-gradient(to top,rgba(255,255,255,0.8),#fff)' }} />
           Available
         </span>
         <span className="legend-item">
-          <span className="legend-swatch" style={{ background: 'var(--gold-grad)' }} />
-          My reservation
+          <span className="legend-swatch" style={{ background: 'var(--gradient-primary)' }} />
+          Selected
         </span>
         <span className="legend-item">
-          <span className="legend-swatch" style={{ background: 'rgba(255,255,255,0.1)' }} />
+          <span className="legend-swatch" style={{ background: 'linear-gradient(135deg,#34d399,#10b981)' }} />
+          Your booking
+        </span>
+        <span className="legend-item">
+          <span className="legend-swatch" style={{ background: 'var(--elevated)' }} />
           Reserved
         </span>
       </div>
