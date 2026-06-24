@@ -64,7 +64,7 @@ h1, h2, h3, h4, h5, h6, .navbar-brand {
   font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1.1;
-  color: #fff;
+  color: var(--text);
 }
 h1 { font-size: clamp(2.4rem, 5.5vw, 4.2rem); }
 h2 { font-size: clamp(1.9rem, 3.6vw, 2.9rem); }
@@ -476,7 +476,7 @@ a:hover { color: var(--primary); }
 .movie-poster { height: 230px; }
 .movie-poster::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(14,14,14,0.85), transparent 60%); }
 .movie-body { padding: 1.2rem 1.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-.movie-title { font-weight: 600; font-size: 1.18rem; color: #fff; letter-spacing: -0.02em; }
+.movie-title { font-weight: 600; font-size: 1.18rem; color: var(--text); letter-spacing: -0.02em; }
 .movie-meta { display: flex; align-items: center; gap: 0.45rem; color: var(--muted); font-size: 0.87rem; }
 .movie-actions { margin-top: auto; padding-top: 1rem; display: flex; gap: 0.55rem; }
 
@@ -645,3 +645,53 @@ a:hover { color: var(--primary); }
   *, .page-enter, .reveal, .movie-card, .auth-card, .poster-float { animation: none !important; transition: none !important; }
   .reveal { opacity: 1; transform: none; filter: none; }
 }
+
+/* ============================================================
+   Light theme (toggled via <html data-theme="light">)
+   ============================================================ */
+:root[data-theme='light'] {
+  --background: #f5f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef0f4;
+  --elevated: #e7e9ee;
+  --border: rgba(0, 0, 0, 0.1);
+  --border-strong: rgba(0, 0, 0, 0.18);
+  --input-bg: #ffffff;
+  --text: #15171c;
+  --muted: #5b6172;
+  --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-lift: 0 18px 44px rgba(0, 0, 0, 0.14);
+}
+:root[data-theme='light'] body {
+  background-image:
+    radial-gradient(900px 540px at 50% -5%, rgba(255, 137, 117, 0.18), transparent 60%),
+    radial-gradient(700px 500px at 100% 8%, rgba(124, 92, 255, 0.08), transparent 55%);
+}
+:root[data-theme='light'] p,
+:root[data-theme='light'] .hero p { color: #3a3f4b; }
+:root[data-theme='light'] a { color: var(--text); }
+:root[data-theme='light'] a:hover { color: var(--primary-2); }
+:root[data-theme='light'] .navbar { background: rgba(255, 255, 255, 0.82) !important; }
+:root[data-theme='light'] .navbar .nav-link { color: #3a3f4b !important; }
+:root[data-theme='light'] .btn-success,
+:root[data-theme='light'] .btn-primary { background: var(--gradient-primary); color: #0e0e0e; }
+:root[data-theme='light'] .seat-available {
+  background: linear-gradient(to top, #e7e9ee, #fff); color: #15171c;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+:root[data-theme='light'] .table thead th, :root[data-theme='light'] .table .table-dark {
+  background: rgba(0, 0, 0, 0.03) !important; color: var(--muted) !important;
+}
+:root[data-theme='light'] ::selection { background: rgba(255, 137, 117, 0.3); color: #15171c; }
+
+/* ============================================================
+   Loading skeletons
+   ============================================================ */
+.skeleton {
+  border-radius: 12px;
+  background: linear-gradient(100deg, var(--surface) 30%, var(--surface-2) 50%, var(--surface) 70%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+.skeleton-card { height: 320px; }
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }

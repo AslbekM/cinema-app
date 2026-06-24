@@ -171,9 +171,10 @@ export default function Home() {
       </Reveal>
 
       {loading ? (
-        <div className="loader">
-          <div className="loader-ring" />
-          <span>{t('home.loading')}</span>
+        <div className="screen-grid">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className="skeleton skeleton-card" />
+          ))}
         </div>
       ) : error ? (
         <div className="alert alert-danger">{error}</div>

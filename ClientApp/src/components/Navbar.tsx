@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useI18n, LANGS } from '../i18n'
@@ -6,6 +7,14 @@ export default function Navbar() {
   const { user, logout } = useAuth()
   const { t, lang, setLang } = useI18n()
   const navigate = useNavigate()
+
+  const [theme, setTheme] = useState<'dark' | 'light'>(
+    () => (localStorage.getItem('theme') as 'dark' | 'light') || 'dark'
+  )
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
 
   const handleLogout = async () => {
     try {
@@ -63,6 +72,16 @@ export default function Navbar() {
             )}
           </ul>
           <ul className="navbar-nav align-items-lg-center">
+            <li className="nav-item me-lg-2">
+              <button
+                className="btn btn-outline-secondary btn-sm"
+                onClick={() => setTheme((th) => (th === 'dark' ? 'light' : 'dark'))}
+                title="Toggle light / dark"
+                aria-label="Toggle theme"
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+            </li>
             <li className="nav-item me-lg-2">
               <select
                 className="form-select form-select-sm lang-select"
