@@ -34,11 +34,6 @@ export default function Navbar() {
         <div className="collapse navbar-collapse" id="navMenu">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <NavLink className="nav-link" to="/" end>
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
               <NavLink className="nav-link" to="/screenings">
                 Screenings
               </NavLink>

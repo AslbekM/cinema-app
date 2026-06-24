@@ -105,8 +105,9 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Serve the React SPA for any route under /app that is not a static file
-app.MapGet("/app", () => Results.Redirect("/app/index.html"));
+// Serve the React SPA for any route under /app that is not a static file.
+// Redirect to "/app/" (with trailing slash) so React Router matches the home route.
+app.MapGet("/app", () => Results.Redirect("/app/"));
 app.MapFallbackToFile("/app/{**slug}", "app/index.html");
 
 // Apply any pending EF Core migrations on startup so a fresh cloud database

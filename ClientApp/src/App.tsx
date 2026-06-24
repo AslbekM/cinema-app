@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import Navbar from './components/Navbar'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -63,6 +63,8 @@ function AppRoutes() {
                 </ProtectedRoute>
               }
             />
+            {/* Any unknown path (including /index.html on first load) shows home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>
   )
