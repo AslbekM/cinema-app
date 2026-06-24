@@ -8,6 +8,7 @@ export default function Users() {
   const [error, setError] = useState<string | null>(null)
   const [msg, setMsg] = useState<{ type: 'success' | 'danger'; text: string } | null>(null)
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [query, setQuery] = useState('')
 
   const load = () => {
     setLoading(true)
@@ -47,12 +48,49 @@ export default function Users() {
 
   if (error) return <div className="alert alert-danger">{error}</div>
 
+  const q = query.trim().toLowerCase()
+  const filtered = q
+    ? users.filter((u) =>
+        [
+          u.firstName,
+          u.lastName,
+          `${u.firstName} ${u.lastName}`,
+          u.email,
+          u.nickname,
+          u.phoneNumber,
+        ]
+          .filter(Boolean)
+          .some((field) => field!.toLowerCase().includes(q))
+      )
+    : users
+
   return (
     <div>
       <div className="section-head">
         <div>
           <h2>Users</h2>
-          <div className="section-sub">{users.length} registered</div>
+          <div className="section-sub">
+            {q ? `${filtered.length} of ${users.length}` : `${users.length} registered`}
+          </div>
+        </div>
+        <div style={{ position: 'relative', minWidth: 260 }}>
+          <input
+            className="form-control"
+            placeholder="🔍 Search by name, email, nickname, phone…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            style={{ paddingRight: query ? '2rem' : undefined }}
+          />
+          {query && (
+            <button
+              className="btn btn-link p-0"
+              onClick={() => setQuery('')}
+              style={{ position: 'absolute', right: 10, top: 7, color: 'var(--muted)' }}
+              title="Clear search"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
 
@@ -80,7 +118,14 @@ export default function Users() {
           </tr>
         </thead>
         <tbody>
-          {users.map((u) => (
+          {filtered.length === 0 && (
+            <tr>
+              <td colSpan={5} className="text-center text-muted py-4">
+                No users match “{query}”.
+              </td>
+            </tr>
+          )}
+          {filtered.map((u) => (
             <tr key={u.id}>
               <td>
                 {u.firstName} {u.lastName}

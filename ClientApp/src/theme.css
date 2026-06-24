@@ -330,6 +330,68 @@ a:hover { color: var(--primary); }
 .poster-float { animation: floaty 6s ease-in-out infinite; }
 
 /* ============================================================
+   Quick Purchase filter bar
+   ============================================================ */
+.quick-bar {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  margin-bottom: 2.6rem;
+}
+.quick-bar-label {
+  background: var(--gradient-primary);
+  color: #0e0e0e;
+  font-weight: 800;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  letter-spacing: 0.5px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 1.1rem 1.5rem;
+  min-width: 132px;
+}
+.quick-field {
+  flex: 1 1 160px;
+  min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.85rem 1.1rem;
+  border-right: 1px solid var(--border);
+}
+.quick-field > label {
+  font-size: 0.64rem;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.quick-field select {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-strong);
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.25rem 0;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.quick-field select:focus { border-bottom-color: var(--primary); }
+.quick-field select option { background: #161616; color: #fff; }
+.quick-search-wrap { display: grid; place-items: center; padding: 0.85rem 1.1rem; }
+@media (max-width: 640px) {
+  .quick-bar-label { width: 100%; padding: 0.9rem; }
+  .quick-field { border-right: none; border-bottom: 1px solid var(--border); }
+  .quick-search-wrap { width: 100%; }
+}
+
+/* ============================================================
    Movie cards grid
    ============================================================ */
 .screen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1.5rem; }
