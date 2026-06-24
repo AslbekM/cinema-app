@@ -32,7 +32,13 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddDbContext<AppDb>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        // Azure SQL serverless auto-pauses when idle; retry transient failures
+        // (including the ~30-60s "database waking up" window) instead of crashing.
+        sql => sql.EnableRetryOnFailure(
+            maxRetryCount: 10,
+            maxRetryDelay: TimeSpan.FromSeconds(20),
+            errorNumbersToAdd: null)));
 
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 {
