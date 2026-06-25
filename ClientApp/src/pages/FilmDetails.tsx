@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { getScreenings, type Screening } from '../api/screenings'
 import { posterFor } from '../posters'
 import { filmMeta, trailerId } from '../films'
+import { getFilmMetaTmdb, type TmdbMeta } from '../api/filmsMeta'
 import { useI18n } from '../i18n'
 import FilmReviews from '../components/FilmReviews'
 
@@ -12,12 +13,18 @@ export default function FilmDetails() {
   const { t } = useI18n()
   const [screenings, setScreenings] = useState<Screening[]>([])
   const [loading, setLoading] = useState(true)
+  const [tmdb, setTmdb] = useState<TmdbMeta | null>(null)
 
   useEffect(() => {
     getScreenings()
       .then(setScreenings)
       .finally(() => setLoading(false))
   }, [])
+
+  // Pull poster/overview/trailer from TMDB as a fallback (no-op if no API key).
+  useEffect(() => {
+    if (title) getFilmMetaTmdb(title).then((m) => m.available && setTmdb(m)).catch(() => {})
+  }, [title])
 
   const showtimes = useMemo(
     () =>
@@ -50,8 +57,9 @@ export default function FilmDetails() {
     )
 
   const meta = filmMeta(title)
-  const poster = posterFor(title)
-  const trailer = trailerId(title)
+  const poster = posterFor(title) ?? tmdb?.posterUrl
+  const trailer = trailerId(title) ?? tmdb?.trailerKey
+  const synopsis = meta?.synopsis ?? tmdb?.overview
 
   return (
     <div>
@@ -77,7 +85,7 @@ export default function FilmDetails() {
                 <span className="chip">🔞 {meta.rating}</span>
               </div>
             )}
-            {meta?.synopsis && <p className="text-muted">{meta.synopsis}</p>}
+            {synopsis && <p className="text-muted">{synopsis}</p>}
           </div>
         </div>
       </div>
