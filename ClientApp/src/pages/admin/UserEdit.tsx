@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { getUser, updateUser, changeUserPassword, type UserInfo } from '../../api/users'
+import {
+  getUserReservations,
+  adminDeleteReservation,
+  type UserReservation,
+} from '../../api/admin'
 import PasswordInput from '../../components/PasswordInput'
 
 export default function UserEdit() {
@@ -23,6 +28,27 @@ export default function UserEdit() {
   const [loading, setLoading] = useState(false)
   const [pwLoading, setPwLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
+  const [reservations, setReservations] = useState<UserReservation[]>([])
+  const [busySeat, setBusySeat] = useState<number | null>(null)
+
+  const loadReservations = () => {
+    if (id) getUserReservations(id).then(setReservations).catch(() => {})
+  }
+  useEffect(loadReservations, [id])
+
+  const handleRemoveReservation = async (r: UserReservation) => {
+    if (!confirm(`Remove seat ${r.rowNumber}-${r.seatNumber} for "${r.filmTitle}" from this user's basket?`))
+      return
+    setBusySeat(r.id)
+    try {
+      await adminDeleteReservation(r.id)
+      setReservations((prev) => prev.filter((x) => x.id !== r.id))
+    } catch (err) {
+      alert(Array.isArray(err) ? err.join('\n') : 'Failed to remove reservation.')
+    } finally {
+      setBusySeat(null)
+    }
+  }
 
   useEffect(() => {
     const stateUser = (location.state as { user?: UserInfo } | null)?.user
@@ -186,6 +212,42 @@ export default function UserEdit() {
             {pwLoading ? 'Changing…' : 'Change Password'}
           </button>
         </form>
+
+        <hr className="my-4" />
+        <h5 className="mb-3">
+          Basket / Reservations <span className="text-muted">({reservations.length})</span>
+        </h5>
+        {reservations.length === 0 ? (
+          <p className="text-muted">This user has no reservations.</p>
+        ) : (
+          <div className="d-flex flex-column gap-2">
+            {reservations.map((r) => (
+              <div
+                key={r.id}
+                className="card"
+                style={{ opacity: r.isPast ? 0.6 : 1 }}
+              >
+                <div className="card-body py-2 d-flex align-items-center gap-2 flex-wrap">
+                  <div className="flex-grow-1" style={{ minWidth: 160 }}>
+                    <div style={{ fontWeight: 600 }}>{r.filmTitle}</div>
+                    <div className="text-muted" style={{ fontSize: '0.82rem' }}>
+                      🕑 {new Date(r.startTime).toLocaleString()} · 📍 {r.cinemaName}
+                    </div>
+                  </div>
+                  <span className="chip">🎟️ Row {r.rowNumber}, Seat {r.seatNumber}</span>
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleRemoveReservation(r)}
+                    disabled={busySeat === r.id}
+                    title="Remove from basket"
+                  >
+                    {busySeat === r.id ? '…' : 'Remove'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )

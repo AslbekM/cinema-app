@@ -8,69 +8,35 @@ export default function Navbar() {
   const { t } = useI18n()
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark">
-      <div className="container">
+    <nav className="navbar navbar-expand navbar-dark">
+      <div className="container flex-nowrap">
         <Link className="navbar-brand" to="/">
           <span className="brand-mark">🎬</span>
-          <span className="brand-text">adafcinema</span>
+          <span className="brand-text d-none d-sm-inline">adafcinema</span>
         </Link>
-        <button
-          className="navbar-toggler border-0"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navMenu"
-          aria-controls="navMenu"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navMenu">
-          <ul className="navbar-nav me-auto">
+
+        <ul className="navbar-nav flex-row me-auto">
+          <li className="nav-item">
+            <NavLink className="nav-link" to="/screenings">
+              {t('nav.screenings')}
+            </NavLink>
+          </li>
+          {user && (
             <li className="nav-item">
-              <NavLink className="nav-link" to="/screenings">
-                {t('nav.screenings')}
+              <NavLink className="nav-link" to="/my-tickets">
+                {t('nav.myTickets')}
               </NavLink>
             </li>
-            {user && (
-              <li className="nav-item">
-                <NavLink className="nav-link" to="/my-tickets">
-                  {t('nav.myTickets')}
-                </NavLink>
-              </li>
-            )}
-            {user?.isAdmin && (
-              <>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin/dashboard">
-                    {t('nav.dashboard')}
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin/users">
-                    {t('nav.users')}
-                  </NavLink>
-                </li>
-                <li className="nav-item">
-                  <NavLink className="nav-link" to="/admin/audit">
-                    Audit
-                  </NavLink>
-                </li>
-              </>
-            )}
-          </ul>
-          <ul className="navbar-nav align-items-lg-center">
-            {!user && (
-              <li className="nav-item">
-                <Link className="btn btn-success btn-sm me-lg-2" to="/login">
-                  {t('nav.login')}
-                </Link>
-              </li>
-            )}
-            <li className="nav-item">
-              <SettingsMenu />
-            </li>
-          </ul>
+          )}
+        </ul>
+
+        <div className="d-flex align-items-center gap-2">
+          {!user && (
+            <Link className="btn btn-success btn-sm" to="/login">
+              {t('nav.login')}
+            </Link>
+          )}
+          <SettingsMenu />
         </div>
       </div>
     </nav>

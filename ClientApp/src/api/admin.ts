@@ -1,4 +1,4 @@
-import { get } from './client'
+import { get, del } from './client'
 
 export interface AdminStats {
   totalUsers: number
@@ -30,3 +30,20 @@ export const getScreeningReservations = (id: number) =>
   get<ScreeningReservation[]>(`/admin/screenings/${id}/reservations`)
 
 export const getAuditLog = () => get<AuditEntry[]>('/admin/audit')
+
+export interface UserReservation {
+  id: number
+  screeningId: number
+  filmTitle: string
+  startTime: string
+  cinemaName: string
+  rowNumber: number
+  seatNumber: number
+  isPast: boolean
+}
+
+export const getUserReservations = (userId: string) =>
+  get<UserReservation[]>(`/admin/users/${userId}/reservations`)
+
+export const adminDeleteReservation = (reservationId: number) =>
+  del<{ message: string }>(`/admin/reservations/${reservationId}`)

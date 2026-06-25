@@ -85,6 +85,22 @@ export default function SettingsMenu() {
 
           <div className="settings-divider" />
 
+          {user?.isAdmin && (
+            <>
+              <div className="settings-section-label">Admin</div>
+              <Link className="settings-item" to="/admin/dashboard" onClick={close}>
+                📊 {t('nav.dashboard')}
+              </Link>
+              <Link className="settings-item" to="/admin/users" onClick={close}>
+                👥 {t('nav.users')}
+              </Link>
+              <Link className="settings-item" to="/admin/audit" onClick={close}>
+                📝 Audit
+              </Link>
+              <div className="settings-divider" />
+            </>
+          )}
+
           {user && (
             <Link className="settings-item" to="/profile" onClick={close}>
               👤 {t('settings.profile')}

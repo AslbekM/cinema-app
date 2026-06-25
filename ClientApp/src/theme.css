@@ -148,6 +148,13 @@ textarea:focus-visible, .seat:focus-visible, .settings-item:focus-visible, [tabi
 .navbar .nav-link:hover, .navbar .nav-link.active { color: var(--primary) !important; }
 .lang-select { width: auto !important; min-width: 80px; }
 
+/* Always-visible top nav stays compact on small screens (no hamburger). */
+@media (max-width: 575.98px) {
+  .navbar .nav-link { padding: 0.4rem 0.55rem !important; font-size: 0.9rem; }
+  .navbar-brand { font-size: 1.15rem; }
+  .navbar .container { padding-left: 0.6rem; padding-right: 0.6rem; }
+}
+
 /* Settings dropdown */
 .settings-menu { position: relative; }
 .settings-panel {

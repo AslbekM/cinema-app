@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tickets.Data;
 using tickets.Models;
+using tickets.Services;
 
 namespace tickets.Controllers.Api
 {
@@ -15,11 +16,54 @@ namespace tickets.Controllers.Api
         private const decimal PricePerSeat = 25m;
         private readonly AppDb _db;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IAuditService _audit;
 
-        public AdminApiController(AppDb db, UserManager<AppUser> userManager)
+        public AdminApiController(AppDb db, UserManager<AppUser> userManager, IAuditService audit)
         {
             _db = db;
             _userManager = userManager;
+            _audit = audit;
+        }
+
+        // A user's basket (their reservations) for admin management.
+        [HttpGet("users/{id}/reservations")]
+        public async Task<IActionResult> UserReservations(string id)
+        {
+            var reservations = await _db.Reservations
+                .Where(r => r.AppUserId == id)
+                .Include(r => r.Screening).ThenInclude(s => s!.Cinema)
+                .Include(r => r.Seat)
+                .OrderBy(r => r.Screening!.StartTime)
+                .ToListAsync();
+
+            return Ok(reservations.Select(r => new
+            {
+                id = r.Id,
+                screeningId = r.ScreeningId,
+                filmTitle = r.Screening!.FilmTitle,
+                startTime = r.Screening.StartTime,
+                cinemaName = r.Screening.Cinema!.Name,
+                rowNumber = r.Seat!.RowNumber,
+                seatNumber = r.Seat.SeatNumber,
+                isPast = r.Screening.StartTime < DateTime.Now
+            }));
+        }
+
+        // Admin removes a single reservation from any user's basket.
+        [HttpDelete("reservations/{reservationId:int}")]
+        public async Task<IActionResult> DeleteReservation(int reservationId)
+        {
+            var reservation = await _db.Reservations
+                .Include(r => r.Seat)
+                .FirstOrDefaultAsync(r => r.Id == reservationId);
+            if (reservation == null) return NotFound(new[] { "Reservation not found." });
+
+            _db.Reservations.Remove(reservation);
+            await _db.SaveChangesAsync();
+            await _audit.LogAsync("AdminDeleteReservation",
+                $"Reservation {reservationId} (screening {reservation.ScreeningId}, seat {reservation.SeatId})");
+
+            return Ok(new { message = "Reservation removed." });
         }
 
         [HttpGet("stats")]
