@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useI18n } from '../i18n'
 
 interface Props {
   seatLabels: string[]
@@ -15,10 +16,10 @@ type Stage = 'form' | 'processing' | 'success' | 'error'
 const onlyDigits = (s: string) => s.replace(/\D/g, '')
 
 const CONCESSIONS = [
-  { id: 'popcorn', label: 'Popcorn (Large)', emoji: '🍿', price: 18 },
-  { id: 'drink', label: 'Soft Drink', emoji: '🥤', price: 10 },
-  { id: 'combo', label: 'Popcorn + Drink Combo', emoji: '🍿🥤', price: 25 },
-  { id: 'nachos', label: 'Nachos', emoji: '🧀', price: 15 },
+  { id: 'popcorn', labelKey: 'con.popcorn', emoji: '🍿', price: 18 },
+  { id: 'drink', labelKey: 'con.drink', emoji: '🥤', price: 10 },
+  { id: 'combo', labelKey: 'con.combo', emoji: '🍿🥤', price: 25 },
+  { id: 'nachos', labelKey: 'con.nachos', emoji: '🧀', price: 15 },
 ]
 
 export default function CheckoutModal({
@@ -29,6 +30,7 @@ export default function CheckoutModal({
   onConfirm,
   onClose,
 }: Props) {
+  const { t } = useI18n()
   const [stage, setStage] = useState<Stage>('form')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
@@ -75,9 +77,9 @@ export default function CheckoutModal({
         {stage === 'success' ? (
           <div className="pay-success">
             <div className="check">✓</div>
-            <h3>Payment successful</h3>
+            <h3>{t('co.success')}</h3>
             <p className="text-muted">
-              Your seats for <strong>{filmTitle}</strong> are booked.
+              {t('co.successSub')} <strong>{filmTitle}</strong> {t('co.areBooked')}
             </p>
             <div className="d-flex flex-wrap gap-2 justify-content-center my-3">
               {seatLabels.map((s) => (
@@ -85,22 +87,23 @@ export default function CheckoutModal({
               ))}
             </div>
             <div className="mb-3" style={{ fontWeight: 600 }}>
-              Paid: {total} {currency}
+              {t('co.paid')}: {total} {currency}
             </div>
             <button className="btn btn-success w-100" onClick={onClose}>
-              Done
+              {t('co.done')}
             </button>
           </div>
         ) : (
           <>
-            <h3>Checkout</h3>
+            <h3>{t('co.checkout')}</h3>
             <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
-              {seatLabels.length} seat{seatLabels.length === 1 ? '' : 's'} for <strong>{filmTitle}</strong>
+              {seatLabels.length} {seatLabels.length === 1 ? t('co.seatFor') : t('co.seatsFor')}{' '}
+              <strong>{filmTitle}</strong>
             </p>
 
             {/* Concessions */}
             <div className="mb-3">
-              <label className="form-label">Add snacks &amp; drinks</label>
+              <label className="form-label">{t('co.addSnacks')}</label>
               <div className="d-flex flex-column gap-2">
                 {CONCESSIONS.map((c) => (
                   <div
@@ -109,7 +112,7 @@ export default function CheckoutModal({
                     style={{ fontSize: '0.92rem' }}
                   >
                     <span style={{ width: 30 }}>{c.emoji}</span>
-                    <span className="flex-grow-1">{c.label}</span>
+                    <span className="flex-grow-1">{t(c.labelKey)}</span>
                     <span className="text-muted">{c.price} {currency}</span>
                     <button className="btn btn-outline-secondary btn-sm py-0 px-2" onClick={() => setItemQty(c.id, -1)}>
                       −
@@ -141,7 +144,7 @@ export default function CheckoutModal({
             </div>
 
             <div className="mb-2">
-              <label className="form-label">Card number</label>
+              <label className="form-label">{t('co.cardNumber')}</label>
               <input
                 className="form-control"
                 inputMode="numeric"
@@ -151,7 +154,7 @@ export default function CheckoutModal({
               />
             </div>
             <div className="mb-2">
-              <label className="form-label">Card holder name</label>
+              <label className="form-label">{t('co.cardHolder')}</label>
               <input
                 className="form-control"
                 placeholder="Jan Kowalski"
@@ -161,7 +164,7 @@ export default function CheckoutModal({
             </div>
             <div className="row g-2 mb-3">
               <div className="col">
-                <label className="form-label">Expiry</label>
+                <label className="form-label">{t('co.expiry')}</label>
                 <input
                   className="form-control"
                   placeholder="MM/YY"
@@ -170,7 +173,7 @@ export default function CheckoutModal({
                 />
               </div>
               <div className="col">
-                <label className="form-label">CVC</label>
+                <label className="form-label">{t('co.cvc')}</label>
                 <input
                   className="form-control"
                   inputMode="numeric"
@@ -183,33 +186,31 @@ export default function CheckoutModal({
 
             {/* Totals breakdown */}
             <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.88rem' }}>
-              <span>Seats</span>
+              <span>{t('co.seats')}</span>
               <span>{seatTotal} {currency}</span>
             </div>
             {concessionsTotal > 0 && (
               <div className="d-flex justify-content-between text-muted" style={{ fontSize: '0.88rem' }}>
-                <span>Snacks</span>
+                <span>{t('co.snacks')}</span>
                 <span>{concessionsTotal} {currency}</span>
               </div>
             )}
             <div className="d-flex justify-content-between mb-3" style={{ fontWeight: 700, fontSize: '1.1rem' }}>
-              <span>Total</span>
+              <span>{t('co.total')}</span>
               <span>{total} {currency}</span>
             </div>
 
-            {touched && !valid && (
-              <div className="alert alert-danger py-2">Please fill in valid card details.</div>
-            )}
+            {touched && !valid && <div className="alert alert-danger py-2">{t('co.invalid')}</div>}
             {stage === 'error' && <div className="alert alert-danger py-2">{errorMsg}</div>}
 
             <button className="btn btn-success w-100" onClick={handlePay} disabled={stage === 'processing'}>
-              {stage === 'processing' ? 'Processing payment…' : `Pay ${total} ${currency}`}
+              {stage === 'processing' ? t('co.processing') : `${t('co.pay')} ${total} ${currency}`}
             </button>
             <button className="btn btn-link w-100 mt-1" onClick={onClose} disabled={stage === 'processing'}>
-              Cancel
+              {t('common.cancel')}
             </button>
             <p className="text-muted text-center mt-2 mb-0" style={{ fontSize: '0.74rem' }}>
-              🔒 Demo checkout — no real payment is processed. Use any test card number.
+              🔒 {t('co.demo')}
             </p>
           </>
         )}

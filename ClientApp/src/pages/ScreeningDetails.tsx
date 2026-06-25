@@ -7,6 +7,7 @@ import SeatGrid from '../components/SeatGrid'
 import CheckoutModal from '../components/CheckoutModal'
 import { posterFor } from '../posters'
 import { filmMeta } from '../films'
+import { useI18n } from '../i18n'
 
 const PRICE_STANDARD = 25
 const PRICE_VIP = 40
@@ -25,6 +26,7 @@ export default function ScreeningDetails() {
   const [checkoutLabels, setCheckoutLabels] = useState<string[]>([])
   const [checkoutTotal, setCheckoutTotal] = useState(0)
   const { user } = useAuth()
+  const { t } = useI18n()
 
   const load = useCallback(() => {
     if (!id) return
@@ -59,7 +61,7 @@ export default function ScreeningDetails() {
     setSelected((prev) => {
       if (prev.includes(seatId)) return prev.filter((x) => x !== seatId)
       if (prev.length >= MAX_SEATS) {
-        showMsg('danger', `You can book at most ${MAX_SEATS} seats per order.`)
+        showMsg('danger', t('sd.maxSeats'))
         return prev
       }
       return [...prev, seatId]
@@ -68,11 +70,11 @@ export default function ScreeningDetails() {
 
   const handleCancel = async (seatId: number) => {
     if (!screening) return
-    if (!confirm('Cancel this booked seat?')) return
+    if (!confirm(t('sd.cancelConfirm'))) return
     setBusy(true)
     try {
       await cancelReservation(screening.id, seatId)
-      showMsg('success', 'Booking cancelled.')
+      showMsg('success', t('sd.bookingCancelled'))
       setScreening(await getScreening(screening.id))
     } catch (err) {
       showMsg('danger', Array.isArray(err) ? err.join(' ') : 'Failed to cancel.')
@@ -111,21 +113,21 @@ export default function ScreeningDetails() {
     return (
       <div className="loader">
         <div className="loader-ring" />
-        <span>Loading seat map…</span>
+        <span>{t('sd.loadingSeats')}</span>
       </div>
     )
 
   if (error || !screening)
     return (
       <div className="alert alert-danger">
-        {error ?? 'Screening not found.'} <Link to="/screenings">Back to screenings</Link>
+        {error ?? t('sd.notFound')} <Link to="/screenings">{t('sd.back')}</Link>
       </div>
     )
 
   return (
     <div>
       <Link to="/screenings" className="btn btn-outline-secondary btn-sm mb-3">
-        ← Back
+        ← {t('sd.back')}
       </Link>
 
       <div className="card mb-4">
@@ -152,7 +154,7 @@ export default function ScreeningDetails() {
             <div className="d-flex flex-wrap gap-2 mb-2">
               <span className="chip">🕑 {new Date(screening.startTime).toLocaleString()}</span>
               <span className="chip">📍 {screening.cinemaName}</span>
-              <span className="chip">💵 Standard {PRICE_STANDARD} · VIP {PRICE_VIP} {CURRENCY}</span>
+              <span className="chip">💵 {t('sd.standard')} {PRICE_STANDARD} · {t('sd.vip')} {PRICE_VIP} {CURRENCY}</span>
             </div>
             {filmMeta(screening.filmTitle)?.synopsis && (
               <p className="text-muted mb-0" style={{ fontSize: '0.92rem' }}>
@@ -171,7 +173,7 @@ export default function ScreeningDetails() {
 
       {!user && (
         <div className="alert alert-info py-2">
-          <Link to="/login">Log in</Link> to select and book seats.
+          <Link to="/login">{t('sd.login')}</Link> {t('sd.loginToBook')}
         </div>
       )}
 
@@ -191,7 +193,7 @@ export default function ScreeningDetails() {
           <div>
             <div className="total">
               {selectedTotal} {CURRENCY}{' '}
-              <small>· {selected.length} seat{selected.length === 1 ? '' : 's'}</small>
+              <small>· {selected.length} {selected.length === 1 ? t('sd.seat') : t('sd.seats')}</small>
             </div>
             <div className="text-muted" style={{ fontSize: '0.82rem' }}>
               {selected.map(seatLabel).join(' · ')}
@@ -199,10 +201,10 @@ export default function ScreeningDetails() {
           </div>
           <div className="d-flex gap-2">
             <button className="btn btn-outline-secondary btn-sm" onClick={() => setSelected([])}>
-              Clear
+              {t('sd.clear')}
             </button>
             <button className="btn btn-success" onClick={openCheckout}>
-              Checkout →
+              {t('sd.checkout')} →
             </button>
           </div>
         </div>

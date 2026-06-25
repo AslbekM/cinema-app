@@ -4,6 +4,7 @@ import { getScreenings, deleteScreening, type Screening } from '../api/screening
 import { useAuth } from '../contexts/AuthContext'
 import Reveal from '../components/Reveal'
 import { posterFor } from '../posters'
+import { useI18n } from '../i18n'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
 const GRADIENTS = [
@@ -23,6 +24,7 @@ export default function ScreeningsList() {
   const [error, setError] = useState<string | null>(null)
   const [deleting, setDeleting] = useState<number | null>(null)
   const { user } = useAuth()
+  const { t } = useI18n()
 
   const load = () => {
     setLoading(true)
@@ -51,7 +53,7 @@ export default function ScreeningsList() {
     return (
       <div className="loader">
         <div className="loader-ring" />
-        <span>Loading screenings…</span>
+        <span>{t('home.loading')}</span>
       </div>
     )
 
@@ -61,14 +63,14 @@ export default function ScreeningsList() {
     <div>
       <div className="section-head">
         <div>
-          <h2>Screenings</h2>
+          <h2>{t('sl.title')}</h2>
           <div className="section-sub">
-            {screenings.length} screening{screenings.length === 1 ? '' : 's'} available
+            {screenings.length} {t('sl.available')}
           </div>
         </div>
         {user?.isAdmin && (
           <Link className="btn btn-success" to="/admin/screenings/create">
-            + Create Screening
+            {t('sl.create')}
           </Link>
         )}
       </div>
@@ -76,7 +78,7 @@ export default function ScreeningsList() {
       {screenings.length === 0 ? (
         <div className="empty-state">
           <span className="emoji">🎟️</span>
-          No screenings available.
+          {t('sl.none')}
         </div>
       ) : (
         <div className="screen-grid">
@@ -96,7 +98,7 @@ export default function ScreeningsList() {
                   <div className="movie-meta">📍 {s.cinemaName}</div>
                   <div className="movie-actions">
                     <Link className="btn btn-success btn-sm flex-grow-1" to={`/screenings/${s.id}`}>
-                      View Seats
+                      {t('sl.viewSeats')}
                     </Link>
                     {user?.isAdmin && (
                       <>

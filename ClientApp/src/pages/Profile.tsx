@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { getProfile, updateProfile, type ProfileData } from '../api/profile'
 import { useAuth } from '../contexts/AuthContext'
 import PasswordInput from '../components/PasswordInput'
+import { useI18n } from '../i18n'
 
 export default function Profile() {
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -19,6 +20,7 @@ export default function Profile() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const { refreshUser } = useAuth()
+  const { t } = useI18n()
 
   useEffect(() => {
     getProfile().then((p) => {
@@ -89,7 +91,7 @@ export default function Profile() {
     return (
       <div className="loader">
         <div className="loader-ring" />
-        <span>Loading profile…</span>
+        <span>{t('profile.loading')}</span>
       </div>
     )
 
@@ -98,8 +100,8 @@ export default function Profile() {
       <div className="col-md-7">
         <div className="section-head">
           <div>
-            <h2>My Profile</h2>
-            <div className="section-sub">Manage your account details</div>
+            <h2>{t('profile.title')}</h2>
+            <div className="section-sub">{t('profile.sub')}</div>
           </div>
         </div>
         <div className="card">
@@ -107,7 +109,7 @@ export default function Profile() {
 
         {success && (
           <div className="alert alert-success alert-dismissible" role="alert">
-            Profile updated successfully.
+            {t('profile.updated')}
             <button type="button" className="btn-close" onClick={() => setSuccess(false)} />
           </div>
         )}
@@ -120,35 +122,35 @@ export default function Profile() {
         <form onSubmit={handleSubmit}>
           <div className="row">
             <div className="col mb-3">
-              <label className="form-label">First Name</label>
+              <label className="form-label">{t('profile.firstName')}</label>
               <input className="form-control" value={form.firstName} onChange={set('firstName')} required maxLength={50} />
             </div>
             <div className="col mb-3">
-              <label className="form-label">Last Name</label>
+              <label className="form-label">{t('profile.lastName')}</label>
               <input className="form-control" value={form.lastName} onChange={set('lastName')} required maxLength={50} />
             </div>
           </div>
           <div className="mb-3">
-            <label className="form-label">Email</label>
+            <label className="form-label">{t('profile.email')}</label>
             <input type="email" className="form-control" value={form.email} onChange={set('email')} required />
           </div>
           <div className="mb-3">
-            <label className="form-label">Nickname</label>
+            <label className="form-label">{t('profile.nickname')}</label>
             <input className="form-control" value={form.nickname} onChange={set('nickname')} required maxLength={30} />
           </div>
           <div className="mb-3">
-            <label className="form-label">Phone Number <span className="text-muted">(optional)</span></label>
+            <label className="form-label">{t('profile.phone')} <span className="text-muted">{t('profile.optional')}</span></label>
             <input type="tel" className="form-control" value={form.phoneNumber} onChange={set('phoneNumber')} />
           </div>
 
           <hr />
-          <h5 className="mb-3">Change Password <span className="text-muted fw-normal fs-6">(leave blank to keep current)</span></h5>
-          <PasswordInput label="Current Password" value={form.currentPassword} onChange={set('currentPassword')} autoComplete="current-password" />
-          <PasswordInput label="New Password" value={form.newPassword} onChange={set('newPassword')} autoComplete="new-password" minLength={6} />
-          <PasswordInput label="Confirm New Password" value={form.confirmNewPassword} onChange={set('confirmNewPassword')} autoComplete="new-password" />
+          <h5 className="mb-3">{t('profile.changePassword')} <span className="text-muted fw-normal fs-6">{t('profile.changeHint')}</span></h5>
+          <PasswordInput label={t('profile.currentPassword')} value={form.currentPassword} onChange={set('currentPassword')} autoComplete="current-password" />
+          <PasswordInput label={t('profile.newPassword')} value={form.newPassword} onChange={set('newPassword')} autoComplete="new-password" minLength={6} />
+          <PasswordInput label={t('profile.confirmNewPassword')} value={form.confirmNewPassword} onChange={set('confirmNewPassword')} autoComplete="new-password" />
 
           <button type="submit" className="btn btn-success" disabled={loading}>
-            {loading ? 'Saving…' : 'Save Changes'}
+            {loading ? t('profile.saving') : t('profile.save')}
           </button>
         </form>
           </div>

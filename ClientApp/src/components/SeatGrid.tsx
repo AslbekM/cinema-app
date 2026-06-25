@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useI18n } from '../i18n'
 
 export interface Seat {
   id: number
@@ -27,6 +28,7 @@ export default function SeatGrid({
   onCancel,
   disabled,
 }: Props) {
+  const { t } = useI18n()
   const reservedSet = new Set(reservedSeatIds)
   const mySet = new Set(mySeatIds)
   const selectedSet = new Set(selectedSeatIds)
@@ -43,7 +45,7 @@ export default function SeatGrid({
   return (
     <div className="seatmap">
       <div className="screen-bar" />
-      <div className="screen-label">Screen</div>
+      <div className="screen-label">{t('seat.screen')}</div>
 
       {Object.entries(rows)
         .sort(([a], [b]) => Number(a) - Number(b))
@@ -102,23 +104,23 @@ export default function SeatGrid({
       <div className="legend">
         <span className="legend-item">
           <span className="legend-swatch" style={{ background: 'linear-gradient(to top,rgba(255,255,255,0.8),#fff)' }} />
-          Available
+          {t('seat.available')}
         </span>
         <span className="legend-item">
           <span className="legend-swatch" style={{ background: 'var(--gradient-primary)' }} />
-          Selected
+          {t('seat.selected')}
         </span>
         <span className="legend-item">
           <span className="legend-swatch" style={{ background: 'linear-gradient(135deg,#34d399,#10b981)' }} />
-          Your booking
+          {t('seat.yourBooking')}
         </span>
         <span className="legend-item">
           <span className="legend-swatch" style={{ background: 'var(--elevated)' }} />
-          Reserved
+          {t('seat.reserved')}
         </span>
         <span className="legend-item">
           <span className="legend-swatch" style={{ background: 'transparent', outline: '2px solid #f5c451', outlineOffset: '-2px' }} />
-          VIP (back rows)
+          {t('seat.vip')}
         </span>
       </div>
     </div>

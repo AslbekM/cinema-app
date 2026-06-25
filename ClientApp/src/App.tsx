@@ -8,6 +8,8 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Profile from './pages/Profile'
 import MyTickets from './pages/MyTickets'
+import Support from './pages/Support'
+import Feedback from './pages/Feedback'
 import ScreeningsList from './pages/ScreeningsList'
 import ScreeningDetails from './pages/ScreeningDetails'
 import Users from './pages/admin/Users'
@@ -26,6 +28,8 @@ function AppRoutes() {
             <Route path="/register" element={<Register />} />
             <Route path="/screenings" element={<ScreeningsList />} />
             <Route path="/screenings/:id" element={<ScreeningDetails />} />
+            <Route path="/support" element={<Support />} />
+            <Route path="/feedback" element={<Feedback />} />
             <Route
               path="/profile"
               element={

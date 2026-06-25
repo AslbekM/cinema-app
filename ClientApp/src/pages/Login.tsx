@@ -5,7 +5,7 @@ import PasswordInput from '../components/PasswordInput'
 import { useI18n } from '../i18n'
 
 export default function Login() {
-  const { t } = useI18n()
+  const { t, te } = useI18n()
   const [nickname, setNickname] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<string[]>([])
@@ -35,7 +35,7 @@ export default function Login() {
         <p className="auth-sub">{t('auth.signInSub')}</p>
         {errors.map((e, i) => (
           <div key={i} className="alert alert-danger py-2">
-            {e}
+            {te(e)}
           </div>
         ))}
         <form onSubmit={handleSubmit}>
