@@ -129,7 +129,7 @@ a:hover { color: var(--primary); }
   box-shadow: 0 6px 20px rgba(255, 111, 77, 0.45);
   font-size: 1.1rem;
 }
-.brand-text { color: #fff; }
+.brand-text { color: var(--text); }
 .navbar .nav-link {
   color: rgba(255, 255, 255, 0.78) !important;
   font-weight: 500; font-size: 0.98rem;

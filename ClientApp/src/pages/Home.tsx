@@ -5,6 +5,7 @@ import Reveal from '../components/Reveal'
 import PosterCarousel from '../components/PosterCarousel'
 import { posterFor } from '../posters'
 import { useI18n } from '../i18n'
+import { useAuth } from '../contexts/AuthContext'
 
 const POSTERS = ['🎬', '🍿', '🎞️', '🎥', '⭐', '🎭', '🚀', '👑']
 const GRADIENTS = [
@@ -32,6 +33,7 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   const { t } = useI18n()
+  const { user } = useAuth()
   const [fCinema, setFCinema] = useState('')
   const [fFilm, setFFilm] = useState('')
   const [fDate, setFDate] = useState('')
@@ -94,14 +96,13 @@ export default function Home() {
           {t('hero.titlePre')} <span className="text-gradient">{t('hero.titleHi')}</span>
         </h1>
         <p>{t('hero.subtitle')}</p>
-        <div className="hero-actions">
-          <Link to="/screenings" className="btn btn-success btn-lg">
-            {t('hero.browse')}
-          </Link>
-          <Link to="/register" className="btn btn-outline-secondary btn-lg">
-            {t('hero.createAccount')}
-          </Link>
-        </div>
+        {!user && (
+          <div className="hero-actions">
+            <Link to="/register" className="btn btn-success btn-lg">
+              {t('hero.createAccount')}
+            </Link>
+          </div>
+        )}
 
         {carouselItems.length > 0 && <PosterCarousel items={carouselItems} />}
       </section>
