@@ -67,7 +67,22 @@ export default function Home() {
       (!fFilm || s.filmTitle === fFilm) &&
       (!fDate || dateKey(s.startTime) === fDate)
   )
-  const visible = hasFilter ? filtered : filtered.slice(0, 8)
+
+  // Group showings into one card per film (links to the film page).
+  const filmCards = useMemo(() => {
+    const map = new Map<string, { title: string; id: number; next: string; count: number }>()
+    for (const s of filtered) {
+      const e = map.get(s.filmTitle)
+      if (!e) map.set(s.filmTitle, { title: s.filmTitle, id: s.id, next: s.startTime, count: 1 })
+      else {
+        e.count++
+        if (+new Date(s.startTime) < +new Date(e.next)) e.next = s.startTime
+      }
+    }
+    return [...map.values()].sort((a, b) => +new Date(a.next) - +new Date(b.next))
+  }, [filtered])
+
+  const visible = hasFilter ? filmCards : filmCards.slice(0, 8)
 
   const reset = () => {
     setFCinema('')
@@ -193,22 +208,24 @@ export default function Home() {
         </div>
       ) : (
         <div className="screen-grid">
-          {visible.map((s, i) => (
-            <Reveal key={s.id} delay={i * 60}>
-              <Link to={`/screenings/${s.id}`} className="movie-card h-100">
-                <div className="movie-poster" style={{ background: grad(s.id) }}>
-                  {posterFor(s.filmTitle) ? (
-                    <img className="poster-img" src={posterFor(s.filmTitle)} alt={s.filmTitle} loading="lazy" />
+          {visible.map((f, i) => (
+            <Reveal key={f.title} delay={i * 60}>
+              <Link to={`/films/${encodeURIComponent(f.title)}`} className="movie-card h-100">
+                <div className="movie-poster" style={{ background: grad(f.id) }}>
+                  {posterFor(f.title) ? (
+                    <img className="poster-img" src={posterFor(f.title)} alt={f.title} loading="lazy" />
                   ) : (
-                    <span className="emoji">{poster(s.id)}</span>
+                    <span className="emoji">{poster(f.id)}</span>
                   )}
                 </div>
                 <div className="movie-body">
-                  <div className="movie-title">{s.filmTitle}</div>
-                  <div className="movie-meta">🕑 {new Date(s.startTime).toLocaleString()}</div>
-                  <div className="movie-meta">📍 {s.cinemaName}</div>
+                  <div className="movie-title">{f.title}</div>
+                  <div className="movie-meta">🕑 {new Date(f.next).toLocaleString()}</div>
+                  <div className="movie-meta">
+                    🎬 {f.count} showtime{f.count === 1 ? '' : 's'}
+                  </div>
                   <div className="movie-actions">
-                    <span className="btn btn-success btn-sm w-100">Select seats</span>
+                    <span className="btn btn-success btn-sm w-100">View showtimes</span>
                   </div>
                 </div>
               </Link>

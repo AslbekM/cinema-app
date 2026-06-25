@@ -15,6 +15,7 @@ import Privacy from './pages/Privacy'
 import AuditLog from './pages/admin/AuditLog'
 import ScreeningsList from './pages/ScreeningsList'
 import ScreeningDetails from './pages/ScreeningDetails'
+import FilmDetails from './pages/FilmDetails'
 import Users from './pages/admin/Users'
 import UserEdit from './pages/admin/UserEdit'
 import CreateScreening from './pages/admin/CreateScreening'
@@ -31,6 +32,7 @@ function AppRoutes() {
             <Route path="/register" element={<Register />} />
             <Route path="/screenings" element={<ScreeningsList />} />
             <Route path="/screenings/:id" element={<ScreeningDetails />} />
+            <Route path="/films/:title" element={<FilmDetails />} />
             <Route path="/support" element={<Support />} />
             <Route path="/feedback" element={<Feedback />} />
             <Route path="/privacy" element={<Privacy />} />

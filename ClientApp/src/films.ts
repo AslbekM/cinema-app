@@ -115,3 +115,24 @@ const FILMS: Record<string, FilmMeta> = {
 }
 
 export const filmMeta = (title: string): FilmMeta | undefined => FILMS[title]
+
+// YouTube trailer IDs per film.
+const TRAILERS: Record<string, string> = {
+  Inception: 'YoHD9XEInc0',
+  'The Dark Knight': 'EXeTwQWrcwY',
+  Interstellar: 'zSWdZVtXT7E',
+  'Dune: Part Two': 'Way9Dexny3w',
+  Oppenheimer: 'uYPbbksJxIg',
+  Barbie: 'pBk4NYhWNMM',
+  'The Matrix': 'vKQi3bBA1y8',
+  'Pulp Fiction': 's7EdQ4FqbhY',
+  'The Godfather': 'sY1S34973zA',
+  'Forrest Gump': 'bLvqoHBptjg',
+  Gladiator: 'owK1qxDselE',
+  'Avatar: The Way of Water': 'd9MyW72ELq0',
+  Joker: 'zAGVQLHvwOY',
+  'Spider-Man: No Way Home': 'JfVOs4VSpmA',
+  Parasite: '5xH0HfJHsaY',
+}
+
+export const trailerId = (title: string): string | undefined => TRAILERS[title]

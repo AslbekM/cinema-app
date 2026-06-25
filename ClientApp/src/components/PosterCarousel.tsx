@@ -89,7 +89,7 @@ export default function PosterCarousel({ items, interval = 3000 }: Props) {
               style={style}
               onClick={() => {
                 if (draggedRef.current) return // ignore clicks that were really a drag
-                if (isActive) navigate(`/screenings/${it.id}`)
+                if (isActive) navigate(`/films/${encodeURIComponent(it.title)}`)
                 else go(i)
               }}
               title={isActive ? `Open ${it.title}` : it.title}
