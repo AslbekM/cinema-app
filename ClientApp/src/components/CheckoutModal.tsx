@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useI18n } from '../i18n'
 
 interface Props {
@@ -6,6 +6,8 @@ interface Props {
   seatTotal: number
   currency: string
   filmTitle: string
+  /** ISO time the seat hold expires; the modal closes itself when it elapses. */
+  expiresAt?: string | null
   /** Performs the actual booking after "payment". Returns an error string on failure. */
   onConfirm: () => Promise<string | null>
   onClose: () => void
@@ -27,12 +29,36 @@ export default function CheckoutModal({
   seatTotal,
   currency,
   filmTitle,
+  expiresAt,
   onConfirm,
   onClose,
 }: Props) {
   const { t } = useI18n()
   const [stage, setStage] = useState<Stage>('form')
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
+  const [remaining, setRemaining] = useState<number>(() =>
+    expiresAt ? Math.max(0, Math.floor((+new Date(expiresAt) - Date.now()) / 1000)) : 0
+  )
+
+  // Seat-hold countdown — auto-close when it runs out (unless already paid).
+  useEffect(() => {
+    if (!expiresAt) return
+    const tick = () => {
+      const left = Math.max(0, Math.floor((+new Date(expiresAt) - Date.now()) / 1000))
+      setRemaining(left)
+      if (left <= 0) {
+        setStage((s) => {
+          if (s === 'form' || s === 'error') onClose()
+          return s
+        })
+      }
+    }
+    tick()
+    const interval = window.setInterval(tick, 1000)
+    return () => window.clearInterval(interval)
+  }, [expiresAt, onClose])
+
+  const mmss = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, '0')}`
 
   const [number, setNumber] = useState('')
   const [name, setName] = useState('')
@@ -95,7 +121,18 @@ export default function CheckoutModal({
           </div>
         ) : (
           <>
-            <h3>{t('co.checkout')}</h3>
+            <div className="d-flex justify-content-between align-items-center">
+              <h3 className="mb-0">{t('co.checkout')}</h3>
+              {expiresAt && (
+                <span
+                  className="chip"
+                  style={{ color: remaining <= 30 ? 'var(--destructive)' : undefined }}
+                  title="Your seats are held until the timer runs out"
+                >
+                  ⏳ {mmss}
+                </span>
+              )}
+            </div>
             <p className="text-muted mb-3" style={{ fontSize: '0.9rem' }}>
               {seatLabels.length} {seatLabels.length === 1 ? t('co.seatFor') : t('co.seatsFor')}{' '}
               <strong>{filmTitle}</strong>

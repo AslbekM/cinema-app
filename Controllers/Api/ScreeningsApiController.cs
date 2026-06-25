@@ -65,6 +65,12 @@ namespace tickets.Controllers.Api
                 ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
                 : null;
 
+            // Seats currently held by OTHER users (active holds) are unavailable too.
+            var nowUtc = DateTime.UtcNow;
+            var heldByOthers = await _db.SeatHolds
+                .Where(h => h.ScreeningId == id && h.ExpiresAt > nowUtc && h.AppUserId != userId)
+                .Select(h => h.SeatId).ToListAsync();
+
             var seats = screening.Cinema?.Seats
                 .OrderBy(s => s.RowNumber).ThenBy(s => s.SeatNumber)
                 .Select(s => new { id = s.Id, rowNumber = s.RowNumber, seatNumber = s.SeatNumber })
@@ -80,7 +86,7 @@ namespace tickets.Controllers.Api
                 rows = screening.Cinema.Rows,
                 seatsPerRow = screening.Cinema.SeatsPerRow,
                 seats,
-                reservedSeatIds = reservations.Select(r => r.SeatId).ToList(),
+                reservedSeatIds = reservations.Select(r => r.SeatId).Concat(heldByOthers).Distinct().ToList(),
                 mySeatIds = reservations.Where(r => r.AppUserId == userId).Select(r => r.SeatId).ToList(),
                 isLoggedIn = User.Identity?.IsAuthenticated ?? false
             });

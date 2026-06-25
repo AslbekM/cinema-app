@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getScreening, type ScreeningDetails as ScreeningDetailsType } from '../api/screenings'
 import { reserveSeat, cancelReservation } from '../api/reservations'
+import { holdSeats, releaseHolds } from '../api/holds'
 import { useAuth } from '../contexts/AuthContext'
 import SeatGrid from '../components/SeatGrid'
 import CheckoutModal from '../components/CheckoutModal'
@@ -25,6 +26,7 @@ export default function ScreeningDetails() {
   const [showCheckout, setShowCheckout] = useState(false)
   const [checkoutLabels, setCheckoutLabels] = useState<string[]>([])
   const [checkoutTotal, setCheckoutTotal] = useState(0)
+  const [holdExpiry, setHoldExpiry] = useState<string | null>(null)
   const { user } = useAuth()
   const { t } = useI18n()
 
@@ -103,10 +105,36 @@ export default function ScreeningDetails() {
     return null
   }
 
-  const openCheckout = () => {
-    setCheckoutLabels(selected.map(seatLabel))
-    setCheckoutTotal(selectedTotal)
-    setShowCheckout(true)
+  const openCheckout = async () => {
+    if (!screening) return
+    setBusy(true)
+    try {
+      const { expiresAt } = await holdSeats(screening.id, selected)
+      setCheckoutLabels(selected.map(seatLabel))
+      setCheckoutTotal(selectedTotal)
+      setHoldExpiry(expiresAt)
+      setShowCheckout(true)
+    } catch {
+      // Some seats were just taken/held by someone else — refresh the map.
+      showMsg('danger', 'Some of your seats were just taken. The seat map has been refreshed.')
+      setSelected([])
+      setScreening(await getScreening(screening.id))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const closeCheckout = async () => {
+    setShowCheckout(false)
+    setHoldExpiry(null)
+    if (screening) {
+      try {
+        await releaseHolds(screening.id)
+      } catch {
+        /* ignore */
+      }
+      setScreening(await getScreening(screening.id))
+    }
   }
 
   if (loading)
@@ -216,8 +244,9 @@ export default function ScreeningDetails() {
           seatTotal={checkoutTotal}
           currency={CURRENCY}
           filmTitle={screening.filmTitle}
+          expiresAt={holdExpiry}
           onConfirm={confirmBooking}
-          onClose={() => setShowCheckout(false)}
+          onClose={closeCheckout}
         />
       )}
     </div>
