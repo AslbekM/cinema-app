@@ -54,19 +54,9 @@ builder.Services.AddRateLimiter(options =>
 // Output caching for public, non-user-specific lists.
 builder.Services.AddOutputCache();
 
-// Application Insights monitoring. Reads APPLICATIONINSIGHTS_CONNECTION_STRING
-// from config; harmless no-op until that is set in Azure.
-builder.Services.AddApplicationInsightsTelemetry();
-
 // Audit trail for security-relevant actions.
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IAuditService, AuditService>();
-
-// Email (SendGrid) — no-op until SendGrid:ApiKey is configured.
-builder.Services.AddScoped<IEmailService, EmailService>();
-
-// TMDB film metadata (poster/overview/trailer) — no-op until Tmdb:ApiKey is set.
-builder.Services.AddHttpClient<IFilmMetaService, TmdbService>();
 
 builder.Services.AddDbContext<AppDb>(options =>
     options.UseSqlServer(

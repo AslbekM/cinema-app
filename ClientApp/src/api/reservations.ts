@@ -19,6 +19,3 @@ export const cancelReservation = (screeningId: number, seatId: number) =>
   del<{ message: string }>('/reservations', { screeningId, seatId })
 
 export const getMyReservations = () => get<MyReservation[]>('/reservations/mine')
-
-export const sendBookingConfirmation = (screeningId: number, seatIds: number[]) =>
-  post<{ message: string }>('/notifications/booking-confirmation', { screeningId, seatIds })

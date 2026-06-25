@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getScreening, type ScreeningDetails as ScreeningDetailsType } from '../api/screenings'
-import { reserveSeat, cancelReservation, sendBookingConfirmation } from '../api/reservations'
+import { reserveSeat, cancelReservation } from '../api/reservations'
 import { holdSeats, releaseHolds } from '../api/holds'
 import { useAuth } from '../contexts/AuthContext'
 import SeatGrid from '../components/SeatGrid'
@@ -101,8 +101,6 @@ export default function ScreeningDetails() {
     }
     setScreening(await getScreening(screening.id))
     setSelected((prev) => prev.filter((sid) => !succeeded.includes(sid)))
-    // Fire-and-forget confirmation email (no-op server-side until SendGrid is set up).
-    if (succeeded.length) sendBookingConfirmation(screening.id, succeeded).catch(() => {})
     if (failed.length) return `These seats were just taken: ${failed.join(', ')}. Please pick others.`
     return null
   }
