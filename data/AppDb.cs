@@ -15,6 +15,7 @@ namespace tickets.Data
         public DbSet<Screening> Screenings { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<AuditLog> AuditLogs { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,6 +56,17 @@ namespace tickets.Data
                 .WithMany()
                 .HasForeignKey(r => r.SeatId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // One review per user per film.
+            modelBuilder.Entity<Review>()
+                .HasIndex(r => new { r.FilmTitle, r.AppUserId })
+                .IsUnique();
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.AppUser)
+                .WithMany()
+                .HasForeignKey(r => r.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private static Seat[] GenerateSeatData()

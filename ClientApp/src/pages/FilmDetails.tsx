@@ -4,6 +4,7 @@ import { getScreenings, type Screening } from '../api/screenings'
 import { posterFor } from '../posters'
 import { filmMeta, trailerId } from '../films'
 import { useI18n } from '../i18n'
+import FilmReviews from '../components/FilmReviews'
 
 export default function FilmDetails() {
   const { title: raw } = useParams<{ title: string }>()
@@ -124,6 +125,8 @@ export default function FilmDetails() {
           ))}
         </div>
       )}
+
+      <FilmReviews filmTitle={title} />
     </div>
   )
 }
