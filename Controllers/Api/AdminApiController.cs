@@ -80,5 +80,23 @@ namespace tickets.Controllers.Api
                 userEmail = r.AppUser.Email
             }));
         }
+
+        // Recent audit trail (who did what).
+        [HttpGet("audit")]
+        public async Task<IActionResult> Audit()
+        {
+            var logs = await _db.AuditLogs
+                .OrderByDescending(a => a.Timestamp)
+                .Take(150)
+                .ToListAsync();
+
+            return Ok(logs.Select(a => new
+            {
+                timestamp = a.Timestamp,
+                userName = a.UserName,
+                action = a.Action,
+                details = a.Details
+            }));
+        }
     }
 }

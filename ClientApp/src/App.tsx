@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-route
 import { AuthProvider } from './contexts/AuthContext'
 import { I18nProvider } from './i18n'
 import Navbar from './components/Navbar'
+import ErrorBoundary from './components/ErrorBoundary'
 import ProtectedRoute from './components/ProtectedRoute'
 import Home from './pages/Home'
 import Login from './pages/Login'
@@ -10,6 +11,8 @@ import Profile from './pages/Profile'
 import MyTickets from './pages/MyTickets'
 import Support from './pages/Support'
 import Feedback from './pages/Feedback'
+import Privacy from './pages/Privacy'
+import AuditLog from './pages/admin/AuditLog'
 import ScreeningsList from './pages/ScreeningsList'
 import ScreeningDetails from './pages/ScreeningDetails'
 import Users from './pages/admin/Users'
@@ -30,6 +33,7 @@ function AppRoutes() {
             <Route path="/screenings/:id" element={<ScreeningDetails />} />
             <Route path="/support" element={<Support />} />
             <Route path="/feedback" element={<Feedback />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route
               path="/profile"
               element={
@@ -86,6 +90,14 @@ function AppRoutes() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/audit"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AuditLog />
+                </ProtectedRoute>
+              }
+            />
             {/* Any unknown path (including /index.html on first load) shows home */}
             <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
@@ -98,8 +110,10 @@ export default function App() {
     <BrowserRouter basename="/app">
       <I18nProvider>
         <AuthProvider>
-          <Navbar />
-          <AppRoutes />
+          <ErrorBoundary>
+            <Navbar />
+            <AppRoutes />
+          </ErrorBoundary>
         </AuthProvider>
       </I18nProvider>
     </BrowserRouter>

@@ -1,4 +1,4 @@
-import { get, put } from './client'
+import { get, put, del } from './client'
 
 export interface ProfileData {
   id: string
@@ -22,3 +22,5 @@ export const updateProfile = (data: {
   currentPassword?: string
   newPassword?: string
 }) => put<ProfileData>('/profile', data)
+
+export const deleteAccount = () => del<{ message: string }>('/profile')

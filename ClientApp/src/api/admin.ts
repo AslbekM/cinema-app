@@ -17,7 +17,16 @@ export interface ScreeningReservation {
   userEmail: string
 }
 
+export interface AuditEntry {
+  timestamp: string
+  userName: string | null
+  action: string
+  details: string | null
+}
+
 export const getAdminStats = () => get<AdminStats>('/admin/stats')
 
 export const getScreeningReservations = (id: number) =>
   get<ScreeningReservation[]>(`/admin/screenings/${id}/reservations`)
+
+export const getAuditLog = () => get<AuditEntry[]>('/admin/audit')

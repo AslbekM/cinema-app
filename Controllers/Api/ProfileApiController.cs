@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tickets.Data;
 using tickets.Models;
+using tickets.Services;
 
 namespace tickets.Controllers.Api
 {
@@ -15,12 +16,38 @@ namespace tickets.Controllers.Api
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly AppDb _db;
+        private readonly IAuditService _audit;
 
-        public ProfileApiController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AppDb db)
+        public ProfileApiController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, AppDb db, IAuditService audit)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _db = db;
+            _audit = audit;
+        }
+
+        // GDPR: a user can permanently delete their own account and all their reservations.
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Unauthorized();
+            if (user.UserName == "admin")
+                return BadRequest(new[] { "The main admin account cannot be deleted." });
+
+            await _audit.LogAsync("DeleteAccount", $"User {user.UserName} deleted their own account");
+
+            // Remove the user's reservations first (FK is Restrict).
+            var mine = _db.Reservations.Where(r => r.AppUserId == user.Id);
+            _db.Reservations.RemoveRange(mine);
+            await _db.SaveChangesAsync();
+
+            await _signInManager.SignOutAsync();
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+                return BadRequest(result.Errors.Select(e => e.Description).ToArray());
+
+            return Ok(new { message = "Account deleted." });
         }
 
         [HttpGet]

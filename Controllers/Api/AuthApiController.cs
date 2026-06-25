@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using tickets.Models;
 
 namespace tickets.Controllers.Api
 {
     [ApiController]
     [Route("api/auth")]
+    [EnableRateLimiting("auth")]
     public class AuthApiController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;

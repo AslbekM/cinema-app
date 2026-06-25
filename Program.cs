@@ -1,7 +1,10 @@
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using tickets.Data;
 using tickets.Models;
+using tickets.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,31 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
+
+// Rate limiting — stricter window for auth endpoints, general window for the rest.
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.AddFixedWindowLimiter("auth", o =>
+    {
+        o.PermitLimit = 10;
+        o.Window = TimeSpan.FromMinutes(1);
+        o.QueueLimit = 0;
+    });
+    options.AddFixedWindowLimiter("api", o =>
+    {
+        o.PermitLimit = 120;
+        o.Window = TimeSpan.FromMinutes(1);
+        o.QueueLimit = 0;
+    });
+});
+
+// Output caching for public, non-user-specific lists.
+builder.Services.AddOutputCache();
+
+// Audit trail for security-relevant actions.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 builder.Services.AddDbContext<AppDb>(options =>
     options.UseSqlServer(
@@ -102,6 +130,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+
+app.UseRateLimiter();
+app.UseOutputCache();
 
 app.UseAuthentication();
 app.UseAuthorization();

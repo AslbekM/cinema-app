@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.EntityFrameworkCore;
 using tickets.Data;
 using tickets.Models;
+using tickets.Services;
 
 namespace tickets.Controllers.Api
 {
@@ -11,9 +13,18 @@ namespace tickets.Controllers.Api
     public class ScreeningsApiController : ControllerBase
     {
         private readonly AppDb _db;
-        public ScreeningsApiController(AppDb db) { _db = db; }
+        private readonly IAuditService _audit;
+        private readonly IOutputCacheStore _cache;
+
+        public ScreeningsApiController(AppDb db, IAuditService audit, IOutputCacheStore cache)
+        {
+            _db = db;
+            _audit = audit;
+            _cache = cache;
+        }
 
         [HttpGet]
+        [OutputCache(Duration = 30, Tags = new[] { "screenings" })]
         public async Task<IActionResult> GetAll()
         {
             // Only list screenings that haven't started yet — expired ones drop off
@@ -79,18 +90,23 @@ namespace tickets.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateScreeningApiRequest req)
         {
+            if (string.IsNullOrWhiteSpace(req.FilmTitle))
+                return BadRequest(new[] { "Film title is required." });
+
             var cinema = await _db.Cinemas.FindAsync(req.CinemaId);
             if (cinema == null) return BadRequest(new[] { "Cinema not found." });
 
             var screening = new Screening
             {
-                FilmTitle = req.FilmTitle,
+                FilmTitle = req.FilmTitle.Trim(),
                 StartTime = req.StartTime,
                 CinemaId = req.CinemaId
             };
 
             _db.Screenings.Add(screening);
             await _db.SaveChangesAsync();
+            await _audit.LogAsync("CreateScreening", $"{screening.FilmTitle} @ {screening.StartTime:g}");
+            await _cache.EvictByTagAsync("screenings", default);
 
             return Ok(new
             {
@@ -112,10 +128,15 @@ namespace tickets.Controllers.Api
             var cinema = await _db.Cinemas.FindAsync(req.CinemaId);
             if (cinema == null) return BadRequest(new[] { "Cinema not found." });
 
-            screening.FilmTitle = req.FilmTitle;
+            if (string.IsNullOrWhiteSpace(req.FilmTitle))
+                return BadRequest(new[] { "Film title is required." });
+
+            screening.FilmTitle = req.FilmTitle.Trim();
             screening.StartTime = req.StartTime;
             screening.CinemaId = req.CinemaId;
             await _db.SaveChangesAsync();
+            await _audit.LogAsync("UpdateScreening", $"Screening {id}: {screening.FilmTitle}");
+            await _cache.EvictByTagAsync("screenings", default);
 
             return Ok(new
             {
@@ -136,6 +157,8 @@ namespace tickets.Controllers.Api
 
             _db.Screenings.Remove(screening);
             await _db.SaveChangesAsync();
+            await _audit.LogAsync("DeleteScreening", $"Screening {id}: {screening.FilmTitle}");
+            await _cache.EvictByTagAsync("screenings", default);
 
             return Ok(new { message = "Screening deleted." });
         }

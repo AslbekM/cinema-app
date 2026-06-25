@@ -79,6 +79,14 @@ a:hover { color: var(--primary); }
 
 ::selection { background: rgba(255, 137, 117, 0.35); color: #fff; }
 
+/* Accessibility: a clear keyboard focus ring (mouse clicks stay clean). */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+textarea:focus-visible, .seat:focus-visible, .settings-item:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 .text-gradient {
   background-image: var(--gradient-primary);
   -webkit-background-clip: text;

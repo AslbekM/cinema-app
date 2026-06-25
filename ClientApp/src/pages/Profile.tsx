@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getProfile, updateProfile, type ProfileData } from '../api/profile'
+import { useNavigate } from 'react-router-dom'
+import { getProfile, updateProfile, deleteAccount, type ProfileData } from '../api/profile'
 import { useAuth } from '../contexts/AuthContext'
 import PasswordInput from '../components/PasswordInput'
 import { useI18n } from '../i18n'
@@ -21,6 +22,19 @@ export default function Profile() {
   const [loading, setLoading] = useState(false)
   const { refreshUser } = useAuth()
   const { t } = useI18n()
+  const navigate = useNavigate()
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Permanently delete your account and all your reservations? This cannot be undone.'))
+      return
+    try {
+      await deleteAccount()
+      await refreshUser()
+      navigate('/')
+    } catch (err) {
+      setErrors(Array.isArray(err) ? err : ['Failed to delete account.'])
+    }
+  }
 
   useEffect(() => {
     getProfile().then((p) => {
@@ -153,6 +167,15 @@ export default function Profile() {
             {loading ? t('profile.saving') : t('profile.save')}
           </button>
         </form>
+
+          <hr className="mt-4" />
+          <h5 className="mb-2" style={{ color: 'var(--destructive)' }}>Danger zone</h5>
+          <p className="text-muted" style={{ fontSize: '0.9rem' }}>
+            Permanently delete your account and all your reservations. This cannot be undone.
+          </p>
+          <button type="button" className="btn btn-danger" onClick={handleDeleteAccount}>
+            Delete my account
+          </button>
           </div>
         </div>
       </div>

@@ -14,6 +14,7 @@ namespace tickets.Data
         public DbSet<Seat> Seats { get; set; }
         public DbSet<Screening> Screenings { get; set; }
         public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

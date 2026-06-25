@@ -96,6 +96,9 @@ export default function SettingsMenu() {
           <Link className="settings-item" to="/feedback" onClick={close}>
             ⭐ {t('settings.feedback')}
           </Link>
+          <Link className="settings-item" to="/privacy" onClick={close}>
+            🔒 Privacy
+          </Link>
 
           {user ? (
             <button className="settings-item" onClick={handleLogout}>

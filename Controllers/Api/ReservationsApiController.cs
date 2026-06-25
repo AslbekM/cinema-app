@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tickets.Data;
 using tickets.Models;
+using tickets.Services;
 
 namespace tickets.Controllers.Api
 {
@@ -14,11 +15,13 @@ namespace tickets.Controllers.Api
     {
         private readonly AppDb _db;
         private readonly UserManager<AppUser> _userManager;
+        private readonly IAuditService _audit;
 
-        public ReservationsApiController(AppDb db, UserManager<AppUser> userManager)
+        public ReservationsApiController(AppDb db, UserManager<AppUser> userManager, IAuditService audit)
         {
             _db = db;
             _userManager = userManager;
+            _audit = audit;
         }
 
         [HttpGet("mine")]
@@ -76,6 +79,7 @@ namespace tickets.Controllers.Api
             try
             {
                 await _db.SaveChangesAsync();
+                await _audit.LogAsync("ReserveSeat", $"Screening {req.ScreeningId}, seat {req.SeatId}");
                 return Ok(new { message = "Seat reserved successfully." });
             }
             catch (DbUpdateException)
@@ -109,6 +113,7 @@ namespace tickets.Controllers.Api
 
             _db.Reservations.Remove(reservation);
             await _db.SaveChangesAsync();
+            await _audit.LogAsync("CancelReservation", $"Screening {req.ScreeningId}, seat {req.SeatId}");
 
             return Ok(new { message = "Reservation cancelled." });
         }

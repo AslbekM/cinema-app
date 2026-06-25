@@ -51,6 +51,11 @@ export default function Navbar() {
                     {t('nav.users')}
                   </NavLink>
                 </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/admin/audit">
+                    Audit
+                  </NavLink>
+                </li>
               </>
             )}
           </ul>

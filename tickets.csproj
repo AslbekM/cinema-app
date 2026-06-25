@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>2be63b32-9098-467e-8dcf-f55b1bddc5ce</UserSecretsId>
+    <!-- The test project lives under tests/; keep its files out of the web build. -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);tests/**</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
